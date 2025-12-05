@@ -1,0 +1,199 @@
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            font-family: "Lilita One";
+            background-color: #000000;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .brail-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('../assets/brailbg.png');
+            background-size: cover; 
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: -1;
+        }
+
+        .main-icon {
+            position: fixed;
+            z-index: -2;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 400px;
+        }
+        
+        .subtitle {
+            position: absolute;
+            top: calc(45% + 100px);
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1rem;
+            color: #6d6d6d;
+            text-align: center;
+        }
+
+        header {
+            width: 100%;
+            text-align: center;
+            padding: 20px;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+            font-size: 1rem;
+            text-transform: capitalize;
+        }
+
+        a {
+           box-shadow: inset 0 0 0 0 #ffffff;
+           color: #54b3d6;
+           margin: 0 -.25rem;
+           padding: 0 .25rem;
+           transition: color .3s ease-in-out, box-shadow .3s ease-in-out;
+        }
+
+        nav a:hover {
+            box-shadow: inset 100px 0 0 0 #5d6dc9;
+            color: white;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            text-align: center;
+        }
+        .content {
+            position: relative;
+            z-index: 1;
+            color: white;
+        }
+        
+        .content-section { 
+            display: 
+            none; 
+            
+        }
+        .content-section.active { 
+            display: block; 
+        }
+
+
+        footer {
+            width: 100%;
+            max-width: 50rem;
+            padding-top: 1rem;
+            margin: 0 auto 1rem;
+            text-align: center;
+            font-family: "Lilita One";
+            font-size: 1rem;
+            color: #6d6d6d;
+            border-top: 1px solid #313131;
+            margin-top: 5rem;
+            z-index: 1;
+        }
+        
+        footer p {
+            margin: 0.5rem 0; 
+        }
+        
+        .mute-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #54b3d6;
+            border-radius: 50%;
+            color: #54b3d6;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            user-select: none;
+        }
+        
+        .mute-button:hover {
+            background: rgba(93, 109, 201, 0.8);
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .mute-button.muted {
+            background: rgba(255, 0, 0, 0.7);
+            border-color: #ff4444;
+            color: #ff4444;
+        }
+        
+        .mute-button.muted:hover {
+            background: rgba(255, 68, 68, 0.8);
+            color: white;
+        }
+        
+        .credit-link {
+    display: inline-block;
+    opacity: 0.5;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    text-decoration: none;
+    position: relative;
+}
+
+.credit-link:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.credit-link::after {
+    content: 'Made by Quagen';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    white-space: nowrap;
+    margin-bottom: 5px;
+}
+
+.credit-link:hover::after {
+    opacity: 1;
+}

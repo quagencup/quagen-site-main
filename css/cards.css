@@ -1,0 +1,304 @@
+/* =========================================================
+   GRID LAYOUT FOR CARDS
+========================================================= */
+.container {
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 160px 40px;
+  margin-top: 80px;
+}
+
+/* =========================================================
+   COMPACT CARD (NORMAL STATE)
+========================================================= */
+.card {
+  width: 250px;
+  height: 145px;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 15px;
+  padding: 20px;
+  padding-top: 60px;
+  position: relative;
+  cursor: pointer;
+  z-index: 1;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease,
+    background 0.25s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.7);
+  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(8, 8, 8, 0.9);
+}
+
+/* profile layout in small card */
+.profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.profile-img {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  object-fit: cover;
+  position: absolute;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.name-tag {
+  text-align: center;
+}
+
+.name-title {
+  color: #ffffff;
+  font-size: 1.2rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* badge in small card */
+.card .tag-img {
+  height: 30px;
+  width: auto;
+  opacity: 0.9;
+  vertical-align: middle;
+}
+
+/* optional chevron – hidden in this design */
+.chevron {
+  display: none;
+}
+
+/* socials container on the SMALL card — keep hidden, we only show them in popup */
+.social-links {
+  display: none;
+}
+
+/* =========================================================
+   BACKDROP OVERLAY WHEN EXPANDED
+========================================================= */
+.card-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 999;
+  transition: opacity 0.25s ease;
+}
+
+.card-overlay.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* =========================================================
+   EXPANDED POPUP CARD
+========================================================= */
+.card-expanded {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* glass panel wrapper */
+.card-expanded-inner {
+  position: relative;
+  width: 750px;
+  max-width: calc(100% - 40px);
+  height: 445px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Inter", 'Lilita One';
+}
+
+/* blurred background image (change URL to whatever you want) */
+.card-bg-blur {
+  position: absolute;
+  inset: 0;
+  background: url("assets/backgrounds/profile-bg.jpg") center/cover no-repeat;
+  filter: blur(8px) brightness(0.35);
+  transform: scale(1.06);
+}
+
+/* foreground card content */
+.card-expanded-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 24px 26px 20px;
+  background: linear-gradient(
+    135deg,
+    rgba(10, 10, 12, 0.96),
+    rgba(3, 3, 5, 0.96)
+  );
+  backdrop-filter: blur(16px);
+  border-radius: 20px;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+}
+
+/* =========================================================
+   TOP PROFILE ROW INSIDE POPUP
+========================================================= */
+.profile-row-expanded {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.profile-img-expanded {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #ffffff15;
+  border: 2px solid rgba(255, 255, 255, 0.09);
+}
+
+.name-tag-expanded {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.name-tag-expanded .name-title {
+  font-size: 1.25rem;
+}
+
+/* badge inside expanded name */
+.card-expanded .tag-img {
+  height: 26px;
+  opacity: 1;
+}
+
+/* =========================================================
+   INFO / DESCRIPTION SECTION
+========================================================= */
+.discord-section {
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   SOCIAL ICONS (ROBLOX / DISCORD) IN POPUP
+========================================================= */
+.social-links-expanded {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  margin: 16px 0 22px;
+}
+
+.social-link-expanded {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: 0.25s ease;
+}
+
+.social-link-expanded:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: translateY(-4px);
+}
+
+/* FIX: make sure logos never blow up huge */
+.social-link-expanded img {
+  width: 32px !important;
+  height: 32px !important;
+  max-width: 32px !important;
+  max-height: 32px !important;
+  object-fit: contain !important;
+  display: block;
+  filter: brightness(0) invert(1);
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+@media (max-width: 768px) {
+  .container {
+    grid-template-columns: 1fr;
+    gap: 150px;
+  }
+
+  .card {
+    max-width: 350px;
+    margin: 0 auto;
+  }
+
+  .card-expanded-inner {
+    width: calc(100% - 32px);
+    height: auto;
+    max-height: 90vh;
+  }
+}
+.view-counter {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.view-icon {
+    width: 30px;
+    height: 30px;
+    opacity: 0.8;
+}
+.icon-tooltip {
+    position: relative;
+    display: inline-block;
+}
+.icon-tooltip::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: 130%;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: rgba(0, 0, 0, 0.8);
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    opacity: 0;
+    transition: all 0.25s ease;
+}
+
+.icon-tooltip:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
