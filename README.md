@@ -1,11 +1,19 @@
-# Discord Bot ReadMe
+[![Typing SVG](https://readme-typing-svg.demolab.com?font=Silkscreen&pause=1000&color=FFFFFF&width=435&lines=QUAGENS+PERSONAL+BIO;QUAGEN.LOL)](https://git.io/typing-svg)
 
-Hello, User please understand if you are seeing this the code used for this Bot is updated everyday meaning the code is Out-Dated. If you want to get our Newest Code you'll have to Pay and become either a ShareHolder or Investor.
+<img align="left" src="https://github.com/quagencup/quagencup/blob/master/image/waving-hand-sign-emoji-2048x1980-s2qlps2b.png" width="147" alt="Wave Image" /> 
 
-Discord Bot Developers, please make sure to keep the bot source up to date and always update and send the files into a Groupchat or by some form of communication needed to keep tabs on all Updates regarding the bot so Troubleshooted can be easier.
+```powershell
+https://quagen.lol
+```
+
+```php
+discord  $  @quagencup
+```
+
+## 
+&zwnj;
+
+> Hello! I'm **@quagencup**, but I go by windows or quagen. I'm a 17 year old Developer studying Coding & Cyber Security. If you'd like to contact me fast use my discord above!(Temporarily Unavaliable)
 
 
-
-
-
-<img src="assets/members/quagenpfp.png">
+</p>
