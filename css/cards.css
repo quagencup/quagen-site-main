@@ -266,19 +266,7 @@
     height: auto;
     max-height: 90vh;
   }
-}
-.view-counter {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 15px;
-    font-weight: 600;
-}
 
-.view-icon {
-    width: 30px;
-    height: 30px;
-    opacity: 0.8;
 }
 .icon-tooltip {
     position: relative;

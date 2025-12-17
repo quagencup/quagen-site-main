@@ -171,10 +171,10 @@
     position: relative;
 }
 
-.credit-link:hover {
-    opacity: 1;
-    transform: scale(1.1);
-}
+        .credit-link:hover {
+            opacity: 1;
+            transform: scale(1.1);  
+}       
 
 .credit-link::after {
     content: 'Made by Quagen';
@@ -196,4 +196,197 @@
 
 .credit-link:hover::after {
     opacity: 1;
+}
+/* =========================================
+   MOBILE TWEAKS (hero + header + layout)
+========================================= */
+@media (max-width: 600px) {
+    header {
+        padding: 12px 8px;
+    }
+
+    header h1 {
+        font-size: 1.6rem;
+        margin-bottom: 6px;
+    }
+
+    nav {
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    nav a {
+        font-size: 0.85rem;
+        padding: 0.2rem 0.5rem;
+    }
+
+    main {
+        align-items: flex-start;
+        padding-top: 40px;
+    }
+
+    .main-icon {
+        width: 260px;
+        height: 260px;
+        top: 35%;
+    }
+
+    .subtitle {
+        top: calc(55% + 40px);
+        font-size: 0.85rem;
+        padding: 0 1rem;
+    }
+
+    footer {
+        padding-top: 0.5rem;
+        margin-bottom: 0.75rem;
+    }
+}
+@media (max-width: 480px) {
+  .container {
+    gap: 120px;
+    margin-top: 60px;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 320px;
+    padding: 16px;
+    padding-top: 56px;
+  }
+
+  .profile-img {
+    width: 110px;
+    height: 110px;
+    top: -70px;
+  }
+
+  .name-title {
+    font-size: 1rem;
+  }
+}
+/* =========================================
+   LEFT SIDEBAR NAV
+========================================= */
+
+header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Arrow / menu toggle */
+.nav-toggle {
+    position: absolute;
+    left: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(10, 10, 10, 0.9);
+    color: #ffffff;
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition:
+        background 0.15s ease-out,
+        border-color 0.15s ease-out,
+        transform 0.15s ease-out,
+        box-shadow 0.15s ease-out;
+}
+
+.nav-toggle:hover {
+    background: rgba(20, 20, 26, 0.95);
+    border-color: rgba(120, 190, 255, 0.7);
+    box-shadow: 0 0 12px rgba(120, 190, 255, 0.5);
+    transform: translateY(-50%) translateX(1px);
+}
+
+/* Sidebar container */
+.side-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 260px;
+    padding: 24px 20px;
+    background: rgba(5, 5, 10, 0.98);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.9);
+    transform: translateX(-100%);
+    transition: transform 0.25s ease-out, box-shadow 0.25s ease-out;
+    z-index: 900;
+}
+
+/* When open */
+.side-nav.open {
+    transform: translateX(0);
+}
+
+/* Inner nav layout */
+.side-nav-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 60px;
+}
+
+.side-nav-title {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    opacity: 0.6;
+    margin-bottom: 6px;
+}
+
+/* Links inside sidebar */
+.side-link {
+    display: block;
+    color: #f5f5f5;
+    text-decoration: none;
+    font-size: 0.95rem;
+    padding: 6px 0;
+    position: relative;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition:
+        color 0.15s ease-out,
+        transform 0.15s ease-out;
+}
+
+.side-link::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    height: 1px;
+    background: rgba(120, 190, 255, 0.8);
+    transition: width 0.18s ease-out;
+}
+
+.side-link:hover {
+    color: #cfe4ff;
+    transform: translateX(2px);
+}
+
+.side-link:hover::before {
+    width: 30%;
+}
+
+/* Small tweak for mobile so header doesn't feel cramped */
+@media (max-width: 600px) {
+    .nav-toggle {
+        left: 12px;
+        padding: 4px 8px;
+        font-size: 0.8rem;
+    }
+
+    .side-nav {
+        width: 230px;
+        padding: 20px 16px;
+    }
 }
