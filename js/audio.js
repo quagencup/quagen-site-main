@@ -1,68 +1,37 @@
-class AudioManager {
-    constructor() {
-        this.anthem = new Audio('replace with github link after upload');
-        this.anthem.loop = true;
-        this.anthem.volume = 20; // Set anthem volume to 20%
-        this.isMuted = false;
-        this.isInitialized = false;
-        this.init();
-    }
+// js/audio.js
 
-    init() {
-        this.createMuteButton();
-        
-        // Initialize audio on first user interaction
-        document.addEventListener('click', () => this.initAudio(), { once: true });
-    }
-    
-    createMuteButton() {
-        const muteButton = document.createElement('button');
-        muteButton.className = 'mute-button';
-        muteButton.innerHTML = '🔊';
-        muteButton.title = 'Mute/Unmute Audio';
-        
-        muteButton.addEventListener('click', () => this.toggleMute());
-        document.body.appendChild(muteButton);
-        
-        this.muteButton = muteButton;
-    }
-    
-    initAudio() {
-        if (!this.isInitialized) {
-            this.anthem.play().catch(error => {
-                console.log("Audio autoplay failed:", error);
-            });
-            this.isInitialized = true;
-        }
-    }
-    
-    toggleMute() {
-        this.isMuted = !this.isMuted;
-        
-        if (this.isMuted) {
-            this.anthem.pause();
-            this.muteButton.innerHTML = '🔇';
-            this.muteButton.classList.add('muted');
-            this.muteButton.title = 'Unmute Audio';
-        } else {
-            if (this.isInitialized) {
-                this.anthem.play().catch(error => {
-                    console.log("Audio play failed:", error);
-                });
+document.addEventListener("DOMContentLoaded", () => {
+    class AudioManager {
+        constructor() {
+            this.anthem = new Audio("assets/songs/anthem.mp3");
+            this.anthem.loop = true;
+            this.anthem.volume = 0.2; // 20%
+
+            this.isInitialized = false;
+
+            // register with global bus if available
+            this.bus = window.GlobalAudioController || null;
+            if (this.bus) {
+                this.bus.registerOtherAudio(this.anthem);
             }
-            this.muteButton.innerHTML = '🔊';
-            this.muteButton.classList.remove('muted');
-            this.muteButton.title = 'Mute Audio';
-        }
-        
-        // Notify profile music player about mute state
-        if (window.profileMusicPlayer) {
-            window.profileMusicPlayer.setMuted(this.isMuted);
-        }
-    }
-    
-    getMuteState() {
-        return this.isMuted;
-    }
-}
 
+            // start on first click
+            document.addEventListener(
+                "click",
+                () => this.initAudio(),
+                { once: true }
+            );
+        }
+
+        initAudio() {
+            if (this.isInitialized) return;
+            this.isInitialized = true;
+
+            this.anthem.play().catch((err) => {
+                console.log("Audio autoplay failed:", err);
+            });
+        }
+    }
+
+    window.globalAudioManager = new AudioManager();
+});
