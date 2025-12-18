@@ -1,15 +1,11 @@
 // js/card-click.js
-// - Expands profile cards into popup
-// - Stops card audio when opening popup (and when closing)
-// - Keeps your communication cards accordion behavior
-// - Overlay click + ESC closes
-
 class CardClickHandler {
   constructor() {
     this.overlay = null;
     this.currentExpandedCard = null;
     this.currentTypingTimer = null;
-    this.currentSourceCard = null; // track which card opened popup
+    this.lastOpenedOriginalCard = null;
+
     this.init();
     this.initCommunicationCards();
   }
@@ -17,14 +13,12 @@ class CardClickHandler {
   init() {
     this.createOverlay();
 
-    // Only attach to profile cards (NOT comm cards)
     const cards = document.querySelectorAll(".card");
     cards.forEach((card) => {
       card.addEventListener("click", (e) => {
-        // Let normal links inside card work
+        // allow links to work
         if (e.target.closest("a")) return;
-
-        // If clicking mute button, don't open popup
+        // ignore card mute button clicks
         if (e.target.closest("[data-card-mute]")) return;
 
         e.stopPropagation();
@@ -33,9 +27,6 @@ class CardClickHandler {
     });
   }
 
-  /* ----------------------------------------------
-     Communication Cards (accordion-style)
-  ---------------------------------------------- */
   initCommunicationCards() {
     const commCards = document.querySelectorAll(".comm-card");
 
@@ -47,7 +38,6 @@ class CardClickHandler {
         if (e.target.closest(".comm-open-btn") || e.target.closest("a")) return;
 
         const alreadyExpanded = card.classList.contains("comm-expanded");
-
         document
           .querySelectorAll(".comm-card.comm-expanded")
           .forEach((c) => c.classList.remove("comm-expanded"));
@@ -66,9 +56,6 @@ class CardClickHandler {
     });
   }
 
-  /* ----------------------------------------------
-     Overlay / Close logic
-  ---------------------------------------------- */
   createOverlay() {
     this.overlay = document.createElement("div");
     this.overlay.className = "card-overlay";
@@ -77,26 +64,19 @@ class CardClickHandler {
     this.overlay.addEventListener("click", () => this.closeCard());
 
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && this.currentExpandedCard) {
-        this.closeCard();
-      }
+      if (e.key === "Escape" && this.currentExpandedCard) this.closeCard();
     });
   }
 
-  /* ----------------------------------------------
-     Popup open
-  ---------------------------------------------- */
   expandCard(originalCard) {
+    // close any existing popup
     this.closeCard();
 
-    // Stop the specific card audio when opening popup
-    if (window.CardPopupAudioHooks?.stopCard) {
-      window.CardPopupAudioHooks.stopCard(originalCard);
-    } else if (window.CardPopupAudioHooks?.stopAllCards) {
-      window.CardPopupAudioHooks.stopAllCards();
-    }
-
-    this.currentSourceCard = originalCard;
+    // ---- Notify music system popup is open for THIS card
+    document.dispatchEvent(
+      new CustomEvent("cardpopup:open", { detail: { card: originalCard } })
+    );
+    this.lastOpenedOriginalCard = originalCard;
 
     const profileImg = originalCard.querySelector(".profile-img");
     const nameTag = originalCard.querySelector(".name-tag");
@@ -108,19 +88,18 @@ class CardClickHandler {
     }
 
     const description =
-      (originalCard.dataset.description || "").trim() ||
+      originalCard.dataset.description?.trim() ||
       "This user has not added a profile description yet.";
 
     const rolesRaw = (originalCard.dataset.roles || "").trim();
     let rolesHTML = "";
-
     if (rolesRaw) {
       const roles = rolesRaw
         .split(",")
         .map((r) => r.trim())
         .filter(Boolean);
 
-      if (roles.length > 0) {
+      if (roles.length) {
         rolesHTML = `
           <div class="role-pills-expanded">
             ${roles.map((r) => `<span class="role-pill">${r}</span>`).join("")}
@@ -132,12 +111,11 @@ class CardClickHandler {
     let socialLinksHTML = "";
     if (socialLinks) {
       const links = socialLinks.querySelectorAll(".social-link");
-      if (links.length > 0) {
+      if (links.length) {
         socialLinksHTML = `<div class="social-links-expanded">`;
         links.forEach((link) => {
           const img = link.querySelector("img");
           if (!img) return;
-
           socialLinksHTML += `
             <a href="${link.href}" target="_blank" rel="noopener noreferrer" class="social-link-expanded">
               <img src="${img.src}" alt="${img.alt}">
@@ -158,10 +136,7 @@ class CardClickHandler {
         <div class="card-expanded-content">
           <div class="profile-row-expanded">
             <img src="${profileImg.src}" alt="${profileImg.alt}" class="profile-img-expanded">
-
-            <div class="name-tag-expanded">
-              ${nameTag.innerHTML}
-            </div>
+            <div class="name-tag-expanded">${nameTag.innerHTML}</div>
           </div>
 
           ${rolesHTML}
@@ -183,17 +158,14 @@ class CardClickHandler {
     `;
 
     expandedCard.addEventListener("click", (e) => {
-      if (!e.target.closest(".card-expanded-inner")) {
-        this.closeCard();
-      }
+      if (!e.target.closest(".card-expanded-inner")) this.closeCard();
     });
 
     document.body.appendChild(expandedCard);
-
     this.overlay.classList.add("active");
     this.currentExpandedCard = expandedCard;
-    document.body.style.overflow = "hidden";
 
+    document.body.style.overflow = "hidden";
     this.startTypingAnimation(expandedCard, description);
   }
 
@@ -211,39 +183,33 @@ class CardClickHandler {
         clearInterval(this.currentTypingTimer);
         return;
       }
-
       if (index >= fullText.length) {
         clearInterval(this.currentTypingTimer);
         return;
       }
-
       target.textContent += fullText.charAt(index);
       index++;
     }, 25);
   }
 
-  /* ----------------------------------------------
-     Close popup
-  ---------------------------------------------- */
   closeCard() {
     if (this.currentTypingTimer) {
       clearInterval(this.currentTypingTimer);
       this.currentTypingTimer = null;
     }
 
+    // ---- Notify music system popup is closing for that card
+    if (this.lastOpenedOriginalCard) {
+      document.dispatchEvent(
+        new CustomEvent("cardpopup:close", { detail: { card: this.lastOpenedOriginalCard } })
+      );
+      this.lastOpenedOriginalCard = null;
+    }
+
     if (this.currentExpandedCard) {
-      try {
-        document.body.removeChild(this.currentExpandedCard);
-      } catch (_) {}
+      document.body.removeChild(this.currentExpandedCard);
       this.currentExpandedCard = null;
     }
-
-    // Stop any card audio on close (safety)
-    if (window.CardPopupAudioHooks?.stopAllCards) {
-      window.CardPopupAudioHooks.stopAllCards();
-    }
-
-    this.currentSourceCard = null;
 
     this.overlay?.classList.remove("active");
     document.body.style.overflow = "";

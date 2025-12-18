@@ -1,120 +1,148 @@
 // js/profile-music.js
-// - Global mute button (#globalMuteBtn) mutes ONLY anthem (handled in js/audio.js by calling bus.registerAnthemAudio)
-// - Card mute buttons (data-card-mute) mute ONLY that card
-// - Leaving a card fades out + stops that card audio
-// - Opening/closing popup (via window.CardPopupAudioHooks) stops any playing card audio
-
 document.addEventListener("DOMContentLoaded", () => {
-  // =====================================================
-  // AUDIO BUS (anthem separate from per-card)
-  // =====================================================
+  // ============================================
+  // SETTINGS
+  // ============================================
+  const FADE_MS = 350;      // crossfade duration
+  const LEAVE_FADE_MS = 250;
+  const CARD_TARGET_VOL = 0.6;
+
+  const ICON_MUTED = "assets/extraicons/muteicon.png";
+  const ICON_UNMUTED = "assets/extraicons/unmuteicon.png";
+
+  // ============================================
+  // Small helpers
+  // ============================================
+  function clamp01(x) {
+    return Math.max(0, Math.min(1, x));
+  }
+
+  function fadeTo(audio, targetVolume, durationMs, onDone) {
+    if (!audio) return;
+    const startVol = audio.volume ?? 1;
+    const target = clamp01(targetVolume);
+
+    if (durationMs <= 0) {
+      audio.volume = target;
+      onDone?.();
+      return;
+    }
+
+    const steps = 24;
+    const stepTime = durationMs / steps;
+    let i = 0;
+
+    const iv = setInterval(() => {
+      i++;
+      const t = i / steps;
+      audio.volume = startVol + (target - startVol) * t;
+
+      if (i >= steps) {
+        clearInterval(iv);
+        audio.volume = target;
+        onDone?.();
+      }
+    }, stepTime);
+
+    return () => clearInterval(iv);
+  }
+
+  // Unlock audio play on first user gesture (browser autoplay rules)
+  let audioUnlocked = false;
+  const unlock = () => { audioUnlocked = true; };
+  window.addEventListener("pointerdown", unlock, { once: true });
+  window.addEventListener("keydown", unlock, { once: true });
+
+  // ============================================
+  // AUDIO BUS (anthem + card states)
+  // ============================================
   class GlobalAudioBus {
     constructor() {
-      this.anthemMuted = false;          // ONLY anthem
-      this.cardMuted = new WeakMap();    // card -> bool
-      this.cardAudios = new Map();       // card -> audio
+      this.anthemMuted = false;
+      this.cardMuted = new WeakMap(); // card -> bool
+      this.cardAudios = new Map();    // card -> Audio
+      this.anthemAudios = new Set();  // anthem audios
 
-      this.anthemAudio = null;           // anthem audio reference
-      this.listeners = [];
+      this.activeCard = null;         // currently "active" card
+      this._listeners = [];
     }
 
     onChange(fn) {
-      if (typeof fn === "function") this.listeners.push(fn);
+      if (typeof fn === "function") this._listeners.push(fn);
     }
 
     _emit() {
-      this.listeners.forEach((fn) => {
+      this._listeners.forEach(fn => {
         try { fn(this); } catch (_) {}
       });
     }
 
-    // -------- Anthem (only) --------
+    // ---- Anthem only ----
     registerAnthemAudio(audio) {
       if (!audio) return;
-      this.anthemAudio = audio;
+      this.anthemAudios.add(audio);
       audio.muted = this.anthemMuted;
-      this._emit();
     }
 
     toggleAnthemMuted() {
       this.anthemMuted = !this.anthemMuted;
-      if (this.anthemAudio) this.anthemAudio.muted = this.anthemMuted;
+      this.anthemAudios.forEach(a => (a.muted = this.anthemMuted));
       this._emit();
     }
 
     setAnthemMuted(val) {
       this.anthemMuted = !!val;
-      if (this.anthemAudio) this.anthemAudio.muted = this.anthemMuted;
+      this.anthemAudios.forEach(a => (a.muted = this.anthemMuted));
       this._emit();
     }
 
     isAnthemMuted() {
-      return !!this.anthemMuted;
+      return this.anthemMuted;
     }
 
-    // -------- Cards (only) --------
-    registerCardAudio(cardEl, audio) {
-      if (!cardEl || !audio) return;
-      this.cardAudios.set(cardEl, audio);
-      this._syncCard(cardEl, audio);
+    // ---- Cards ----
+    registerCardAudio(card, audio) {
+      if (!card || !audio) return;
+      this.cardAudios.set(card, audio);
+      audio.muted = !!this.cardMuted.get(card);
       this._emit();
     }
 
-    _syncCard(cardEl, audio) {
-      const muted = !!this.cardMuted.get(cardEl);
-      audio.muted = muted; // IMPORTANT: anthem mute does NOT affect cards
-    }
-
-    toggleCardMuted(cardEl) {
-      if (!cardEl) return;
-      const current = !!this.cardMuted.get(cardEl);
-      this.cardMuted.set(cardEl, !current);
-      const audio = this.cardAudios.get(cardEl);
-      if (audio) this._syncCard(cardEl, audio);
+    toggleCardMuted(card) {
+      if (!card) return;
+      const now = !this.isCardMuted(card);
+      this.cardMuted.set(card, now);
+      const a = this.cardAudios.get(card);
+      if (a) a.muted = now;
       this._emit();
     }
 
-    setCardMuted(cardEl, val) {
-      if (!cardEl) return;
-      this.cardMuted.set(cardEl, !!val);
-      const audio = this.cardAudios.get(cardEl);
-      if (audio) this._syncCard(cardEl, audio);
+    isCardMuted(card) {
+      return !!this.cardMuted.get(card);
+    }
+
+    getCardAudio(card) {
+      return this.cardAudios.get(card) || null;
+    }
+
+    setActiveCard(card) {
+      this.activeCard = card;
       this._emit();
     }
 
-    isCardMuted(cardEl) {
-      return !!this.cardMuted.get(cardEl);
-    }
-
-    // -------- Utilities --------
-    stopAllCardAudio() {
-      this.cardAudios.forEach((audio) => {
-        try {
-          audio.pause();
-          audio.currentTime = 0;
-        } catch (_) {}
-      });
-    }
-
-    stopCardAudio(cardEl) {
-      const audio = this.cardAudios.get(cardEl);
-      if (!audio) return;
-      try {
-        audio.pause();
-        audio.currentTime = 0;
-      } catch (_) {}
+    getActiveCard() {
+      return this.activeCard;
     }
   }
 
-  // Create bus once
   if (!window.GlobalAudioController) {
     window.GlobalAudioController = new GlobalAudioBus();
   }
   const bus = window.GlobalAudioController;
 
-  // =====================================================
-  // GLOBAL MUTE BUTTON (top-right) -> ANTHEM ONLY
-  // =====================================================
+  // ============================================
+  // TOP-RIGHT MUTE BUTTON (ANTHEM ONLY)
+  // ============================================
   const globalMuteBtn = document.getElementById("globalMuteBtn");
 
   function updateGlobalMuteButton() {
@@ -125,12 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
     globalMuteBtn.classList.toggle("muted", muted);
     globalMuteBtn.setAttribute("aria-pressed", muted ? "true" : "false");
 
-    if (img) {
-      img.src = muted
-        ? "assets/extraicons/muteicon.png"
-        : "assets/extraicons/unmuteicon.png";
-      img.alt = muted ? "muted" : "unmuted";
-    }
+    if (img) img.src = muted ? ICON_MUTED : ICON_UNMUTED;
   }
 
   if (globalMuteBtn) {
@@ -139,122 +162,153 @@ document.addEventListener("DOMContentLoaded", () => {
       updateGlobalMuteButton();
     });
   }
-
   bus.onChange(updateGlobalMuteButton);
   updateGlobalMuteButton();
 
-  // =====================================================
-  // Fade helper (cards)
-  // =====================================================
-  function fadeOutAndStop(audio, duration = 250) {
-    if (!audio) return;
-    const startVolume = typeof audio.volume === "number" ? audio.volume : 0.6;
+  // ============================================
+  // CROSSFADE ENGINE
+  // ============================================
+  // Fade out any currently playing card audio (except keepIfCard), optionally stop/reset
+  function fadeOutAllCards(exceptCard = null, duration = LEAVE_FADE_MS) {
+    bus.cardAudios.forEach((audio, card) => {
+      if (!audio) return;
+      if (exceptCard && card === exceptCard) return;
 
-    // If already paused, just reset
-    if (audio.paused) {
-      try { audio.currentTime = 0; } catch (_) {}
+      if (!audio.paused) {
+        fadeTo(audio, 0, duration, () => {
+          audio.pause();
+          audio.currentTime = 0;
+          audio.volume = CARD_TARGET_VOL; // restore base for next time
+        });
+      }
+    });
+  }
+
+  function crossfadeToCard(card) {
+    const nextAudio = bus.getCardAudio(card);
+    if (!nextAudio) return;
+
+    // If card is muted, do nothing (but still fade out others so it's clean)
+    if (bus.isCardMuted(card)) {
+      fadeOutAllCards(null, FADE_MS);
+      bus.setActiveCard(card);
       return;
     }
 
-    const steps = 10;
-    const stepTime = Math.max(10, duration / steps);
-    let step = 0;
+    // Fade out all others (including previous active)
+    fadeOutAllCards(card, FADE_MS);
 
-    const interval = setInterval(() => {
-      step++;
-      const next = Math.max(0, startVolume * (1 - step / steps));
-      audio.volume = next;
-
-      if (step >= steps) {
-        clearInterval(interval);
-        try {
-          audio.pause();
-          audio.currentTime = 0;
-        } catch (_) {}
-        // reset for next play
-        audio.volume = startVolume;
+    // Fade in this one
+    try {
+      // ensure it starts audible from 0
+      nextAudio.volume = 0;
+      if (audioUnlocked) {
+        nextAudio.play().catch(() => {});
       }
-    }, stepTime);
+      fadeTo(nextAudio, CARD_TARGET_VOL, FADE_MS);
+    } catch (_) {}
+
+    bus.setActiveCard(card);
   }
 
-  // =====================================================
-  // CARD AUDIO + PER-CARD MUTE + LEAVE FADE
-  // =====================================================
-  const musicCards = document.querySelectorAll(".card[data-music]");
+  // ============================================
+  // CARDS: PLAY / FADE / POPUP LOCK
+  // ============================================
+  const cards = document.querySelectorAll(".card[data-music]");
 
-  function setupCardAudio(card) {
+  cards.forEach((card) => {
     const src = (card.dataset.music || "").trim();
     if (!src) return;
 
     const audio = new Audio(src);
     audio.loop = true;
-    audio.volume = 0.6;
+    audio.volume = CARD_TARGET_VOL;
 
     bus.registerCardAudio(card, audio);
 
-    // Clicking the card toggles play/pause
-    // Ignore mute button & links inside card
-    card.addEventListener("click", (e) => {
-      if (e.target.closest("[data-card-mute]")) return;
-      if (e.target.closest("a")) return;
+    // Track when this card's popup is open (so mouseleave doesn't instantly fade)
+    let popupOpenForThisCard = false;
 
-      // Only play if NOT muted for that card
-      if (bus.isCardMuted(card)) return;
-
-      if (audio.paused) {
-        audio.play().catch(() => {});
-      } else {
-        // pause without resetting time (feels nicer)
-        audio.pause();
-      }
+    // ENTER → crossfade to this card
+    card.addEventListener("mouseenter", () => {
+      crossfadeToCard(card);
     });
 
-    // Leaving card -> fade out and stop (your requirement)
+    // LEAVE → fade out ONLY if popup not open
     card.addEventListener("mouseleave", () => {
-      if (!audio.paused) fadeOutAndStop(audio, 240);
+      if (popupOpenForThisCard) return;
+
+      const a = bus.getCardAudio(card);
+      if (!a || a.paused) return;
+
+      fadeTo(a, 0, LEAVE_FADE_MS, () => {
+        a.pause();
+        a.currentTime = 0;
+        a.volume = CARD_TARGET_VOL;
+      });
     });
 
-    // Per-card mute button
+    // Card mute button
     const muteBtn = card.querySelector("[data-card-mute]");
     if (muteBtn) {
       const img = muteBtn.querySelector("img");
 
-      function updateCardMuteButtonVisual() {
+      const updateCardMuteVisual = () => {
         const muted = bus.isCardMuted(card);
         muteBtn.classList.toggle("muted", muted);
         muteBtn.setAttribute("aria-pressed", muted ? "true" : "false");
-
-        if (img) {
-          img.src = muted
-            ? "assets/extraicons/muteicon.png"
-            : "assets/extraicons/unmuteicon.png";
-          img.alt = muted ? "muted" : "unmuted";
-        }
-      }
+        if (img) img.src = muted ? ICON_MUTED : ICON_UNMUTED;
+      };
 
       muteBtn.addEventListener("click", (e) => {
+        e.preventDefault();
         e.stopPropagation();
+
         bus.toggleCardMuted(card);
+        updateCardMuteVisual();
 
-        // If muting while playing -> stop immediately (fade feels best)
-        if (bus.isCardMuted(card) && !audio.paused) {
-          fadeOutAndStop(audio, 200);
+        // If muting the active card, fade it out
+        if (bus.isCardMuted(card)) {
+          const a = bus.getCardAudio(card);
+          if (a && !a.paused) {
+            fadeTo(a, 0, 180, () => {
+              a.pause();
+              a.currentTime = 0;
+              a.volume = CARD_TARGET_VOL;
+            });
+          }
         }
-
-        updateCardMuteButtonVisual();
       });
 
-      bus.onChange(updateCardMuteButtonVisual);
-      updateCardMuteButtonVisual();
+      bus.onChange(updateCardMuteVisual);
+      updateCardMuteVisual();
     }
-  }
 
-  musicCards.forEach(setupCardAudio);
+    // Popup open/close events from card-click.js
+    document.addEventListener("cardpopup:open", (e) => {
+      if (e.detail?.card !== card) return;
+      popupOpenForThisCard = true;
 
-  // =====================================================
-  // Hooks for popup open/close (card-click.js calls these)
-  // =====================================================
-  window.CardPopupAudioHooks = window.CardPopupAudioHooks || {};
-  window.CardPopupAudioHooks.stopAllCards = () => bus.stopAllCardAudio();
-  window.CardPopupAudioHooks.stopCard = (cardEl) => bus.stopCardAudio(cardEl);
+      // When popup opens, keep this card as the active source (no fade)
+      // also ensure its audio is on (if not muted)
+      if (!bus.isCardMuted(card)) {
+        crossfadeToCard(card);
+      }
+    });
+
+    document.addEventListener("cardpopup:close", (e) => {
+      if (e.detail?.card !== card) return;
+      popupOpenForThisCard = false;
+
+      // Fade out when leaving popup
+      const a = bus.getCardAudio(card);
+      if (a && !a.paused) {
+        fadeTo(a, 0, LEAVE_FADE_MS, () => {
+          a.pause();
+          a.currentTime = 0;
+          a.volume = CARD_TARGET_VOL;
+        });
+      }
+    });
+  });
 });
