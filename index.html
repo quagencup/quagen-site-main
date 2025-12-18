@@ -9,18 +9,18 @@
 
   <link rel="stylesheet" href="css/site.css" />
 
-  <meta property="og:title" content="@quagen website" />
-  <meta property="og:description" content="quagen's personal website" />
-  <meta property="og:image" content="assets/webicon.png" />
+  <meta property="og:title" content="quagen.lol | Official Website" />
+  <meta property="og:description" content="Website created for the Project: Quagen Studios" />
+  <meta property="og:image" content="assets/quagenchristmas3.png" />
 
   <!-- Scripts (defer keeps order) -->
   <script src="js/translations.js" defer></script>
   <script src="js/i18n.js" defer></script>
   <script src="js/lang-dropdown.js" defer></script>
   <script src="js/section.js" defer></script>
-  <script src="js/profile-music.js" defer></script>
   <script src="js/audio.js" defer></script>
   <script src="js/oneko.js" defer></script>
+  <script src="js/profile-music.js" defer></script>
   <script src="js/card-click.js" defer></script>
 </head>
 
@@ -49,6 +49,8 @@
       <img src="assets/extraicons/unmuteicon.png" alt="Global audio">
     </button>
   </header>
+
+
 
   <!-- LEFT SIDEBAR NAV -->
   <aside id="sideNav" class="side-nav" aria-hidden="true">
@@ -120,7 +122,7 @@
     <section id="founder" class="content-section">
       <div class="container">
         <div class="card"
-             data-music="assets/songs/quagen-theme.mp3"
+             data-music="assets/songs/quagen-theme2.mp3"
              data-description="Founder of Quagen Studios. Building games, tools, and experiences."
              data-roles="Founder">
 
@@ -129,7 +131,7 @@
                   data-card-mute
                   aria-label="Mute this card audio"
                   aria-pressed="false">
-            <img src="assets/extraicons/unmuteicon.png" alt="">
+            <img src="assets/extraicons/unmuteicon.png" alt="unmuted">
           </button>
 
           <div class="profile">
@@ -167,7 +169,7 @@
 
         <div class="card"
              data-music="assets/songs/cake-theme.mp3"
-             data-description="Cake — Lead Developer & UI Dev at Quagen Studios."
+             data-description="Cake — Co-Founder & Lead Developer at Quagen Studios."
              data-roles="Co-Founder">
 
           <button class="card-mute-btn"
@@ -175,7 +177,7 @@
                   data-card-mute
                   aria-label="Mute this card audio"
                   aria-pressed="false">
-            <img src="assets/extraicons/unmuteicon.png" alt="">
+            <img src="assets/extraicons/unmuteicon.png" alt="unmuted">
           </button>
 
           <div class="profile">
@@ -391,7 +393,7 @@
         <div class="container team-cards">
           <div class="card"
                data-display="@testername"
-               data-music="assets/songs/tester-theme.mp3"
+               data-music="assets/songs/imari-theme.mp3"
                data-description="🎀 Tester at Quagen Studios. 🎀">
 
             <button class="card-mute-btn" type="button" data-card-mute aria-label="Mute this card audio" aria-pressed="false">
@@ -1404,6 +1406,6 @@
       </div>
     </div>
   </footer>
-
+  <audio id="anthemAudio" src="assets/songs/anthem.mp3" loop preload="auto"></audio>
 </body>
 </html>

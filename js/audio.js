@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
             this.isInitialized = false;
 
             // register with global bus if available
-            this.bus = window.GlobalAudioController || null;
+            this.bus.registerAnthemAudio(this.anthem);
             if (this.bus) {
                 this.bus.registerOtherAudio(this.anthem);
             }
