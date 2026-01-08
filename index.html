@@ -31,7 +31,7 @@
 
   <!-- HEADER -->
   <header>
-    <!-- Sidebar / Tab nav toggle -->
+    <!-- Sidebar / Tab Nav  -->
     <button id="navToggle"
             class="nav-toggle"
             aria-label="Toggle navigation"
@@ -41,7 +41,7 @@
 
     <h1 data-i18n="header.brand">QUAGEN</h1>
 
-    <!-- GLOBAL MUTE (top-right, controls anthem + cards) -->
+    <!-- GLOBAL MUTE -->
     <button id="globalMuteBtn"
             class="global-mute-btn"
             aria-label="Global mute / unmute"
@@ -238,7 +238,7 @@
       </div>
 
       <div id="team-mods" class="sub-content active">
-  <div class="container team-cards">
+        <div class="container team-cards">
 
     <!-- Card 1 -->
     <div class="card"
@@ -769,9 +769,7 @@
 
         <div class="legal-grid">
           <article class="legal-panel legal-fade" aria-label="Changelog details">
-            <!-- (UNCHANGED CONTENT) -->
-            <!-- ... your sections 1-12 exactly as you pasted ... -->
-            <!-- NOTE: I kept your content, just removed the accidental duplicate sidebar block below. -->
+           
 
             <section class="legal-item">
               <header class="legal-item-head">
@@ -818,8 +816,7 @@
 
             <div class="legal-divider"></div>
 
-            <!-- (keep the rest of your changelog items exactly the same) -->
-            <!-- I’m not re-pasting all 12 again to keep this message readable. -->
+          
           </article>
 
           <!-- RIGHT: sidebar (ONLY ONCE) -->
@@ -1237,15 +1234,15 @@
     <div class="status-banner status-banner-warn" id="statusBanner" hidden>
       <span class="status-banner-dot" aria-hidden="true"></span>
       <div class="status-banner-text">
-        <strong>Degraded services</strong>
+        <strong>Systems Services Outages/Degraded</strong>
         <span>Some systems may be slower than normal.</span>
       </div>
     </div>
 
     <!-- Big overall pill -->
     <div class="status-summary" id="statusSummary">
-      <span class="status-dot status-green" id="summaryDot"></span>
-      <span class="status-summary-text" id="summaryText">All systems operational</span>
+      <span class="status-dot status-red status-pulse" id="summaryDot"></span>
+      <span class="status-summary-text" id="summaryText">Some Systems Operational</span>
     </div>
 
     <div class="status-grid">
@@ -1254,7 +1251,7 @@
         <article class="status-card">
           <div class="status-card-head">
             <h3 class="status-card-title">quagen.lol</h3>
-            <span class="status-pill status-pill-green" id="sitePill">Operational</span>
+            <span class="status-pill status-pill-red" id="sitePill">Some Systems Operational</span>
           </div>
 
           <div class="status-rows">
@@ -1265,8 +1262,8 @@
                 <span class="status-name">Website</span>
               </div>
               <div class="status-row-right">
-                <span class="status-state">Fast</span>
-                <span class="status-dot status-green" aria-hidden="true"></span>
+                <span class="status-state">Degraded</span>
+                <span class="status-dot status-yellow status-pulse" aria-hidden="true"></span>
               </div>
             </div>
 
@@ -1277,7 +1274,7 @@
               </div>
               <div class="status-row-right">
                 <span class="status-state">Fast</span>
-                <span class="status-dot status-green" aria-hidden="true"></span>
+                <span class="status-dot status-green status-pulse" aria-hidden="true"></span>
               </div>
             </div>
 
@@ -1288,7 +1285,7 @@
               </div>
               <div class="status-row-right">
                 <span class="status-state">Fast</span>
-                <span class="status-dot status-green" aria-hidden="true"></span>
+                <span class="status-dot status-green status-pulse" aria-hidden="true"></span>
               </div>
             </div>
 
@@ -1320,8 +1317,8 @@
                 <span class="status-name">Discord</span>
               </div>
               <div class="status-row-right">
-                <span class="status-state">Fast</span>
-                <span class="status-dot status-green" aria-hidden="true"></span>
+                <span class="status-state">Outage</span>
+                <span class="status-dot status-red status-pulse" aria-hidden="true"></span>
               </div>
             </div>
 
@@ -1331,8 +1328,8 @@
                 <span class="status-name">Roblox</span>
               </div>
               <div class="status-row-right">
-                <span class="status-state">Fast</span>
-                <span class="status-dot status-green" aria-hidden="true"></span>
+                <span class="status-state">Outage</span>
+                <span class="status-dot status-red status-pulse" aria-hidden="true"></span>
               </div>
             </div>
           </div>
@@ -1374,12 +1371,12 @@
 
         <!-- Button sits to the RIGHT of quagen.lol -->
         <button class="system-status-btn" data-open-status type="button" aria-label="Open System Status">
-          <span class="status-dot status-green" id="sysBtnDot" aria-hidden="true"></span>
+          <span class="status-dot status-red" id="sysBtnDot" aria-hidden="true"></span>
           <span class="sys-btn-text">System Status</span>
 
           <!-- tooltip text changes -->
           <span class="sys-tooltip" id="sysTooltip" role="tooltip">
-            All systems operational
+            Some Systems Are Operational
           </span>
         </button>
       </div>
