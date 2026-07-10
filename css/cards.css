@@ -208,6 +208,19 @@
   line-height: 1.5;
 }
 
+/* typing cursor for description */
+.typing-cursor {
+  display: inline-block;
+  margin-left: 2px;
+  animation: blink-cursor 0.9s steps(2, start) infinite;
+  opacity: 0.8;
+}
+
+@keyframes blink-cursor {
+  0%, 50% { opacity: 1; }
+  50.01%, 100% { opacity: 0; }
+}
+
 /* =========================================================
    SOCIAL ICONS (ROBLOX / DISCORD) IN POPUP
 ========================================================= */
@@ -267,38 +280,410 @@
     max-height: 90vh;
   }
 }
-.view-counter {
+
+/* =========================================================
+   BADGES (NEXT TO NAME)
+========================================================= */
+
+/* Container holding badges next to the name */
+.role-badges {
+    display: inline-flex;
+    gap: 4px;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
+/* Base badge style */
+.badge-icon {
+    width: 24px;          /* adjust size here */
+    height: 24px;
+    border-radius: 8px;   /* slightly rounded square */
+    display: inline-block;
+    object-fit: contain;
+    padding: 3px;
+    background: #111218;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.5);
+    transform: translateY(1px);
+    transition:
+        transform 0.15s ease-out,
+        box-shadow 0.15s ease-out,
+        border-color 0.15s ease-out,
+        background 0.15s ease-out;
+}
+
+/* Admin = red */
+.badge-admin {
+    border-color: rgba(255, 80, 90, 0.7);
+    box-shadow: 0 0 8px rgba(255, 80, 90, 0.35);
+}
+
+/* Staff = purple */
+.badge-staff {
+    border-color: rgba(180, 120, 255, 0.7);
+    box-shadow: 0 0 8px rgba(180, 120, 255, 0.35);
+}
+
+/* Booster = pink */
+.badge-booster {
+    border-color: rgba(255, 120, 200, 0.7);
+    box-shadow: 0 0 8px rgba(255, 120, 200, 0.35);
+}
+
+/* Donator = gold */
+.badge-donator {
+    border-color: rgba(255, 204, 102, 0.9);
+    box-shadow: 0 0 8px rgba(255, 204, 102, 0.4);
+}
+
+/* Member = teal */
+.badge-member {
+    border-color: rgba(90, 220, 200, 0.8);
+    box-shadow: 0 0 8px rgba(90, 220, 200, 0.4);
+}
+
+/* Verified = bluish */
+.badge-verified {
+    border-color: rgba(120, 190, 255, 0.85);
+    box-shadow: 0 0 8px rgba(120, 190, 255, 0.45);
+}
+
+.badge-icon:hover {
+    transform: translateY(0) scale(1.05);
+    box-shadow: 0 0 14px rgba(255, 255, 255, 0.25);
+    background: #181a23;
+}
+
+.badge-icon {
+    position: relative;
+}
+
+/* Tooltip bubble */
+.badge-icon[data-badge-label]::after {
+    content: attr(data-badge-label);
+    position: absolute;
+    left: 50%;
+    top: -6px;
+    transform: translate(-50%, -100%);
+    white-space: nowrap;
+    font-size: 11px;
+    letter-spacing: 0.03em;
+    padding: 4px 8px;
+    background: rgba(5, 5, 10, 0.95);
+    color: #f5f5f5;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+    opacity: 0;
+    pointer-events: none;
+    transform-origin: bottom center;
+    scale: 0.9;
+    transition:
+        opacity 0.12s ease-out,
+        transform 0.12s ease-out,
+        scale 0.12s ease-out;
+}
+
+/* Little arrow under the tooltip */
+.badge-icon[data-badge-label]::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: -6px;
+    transform: translate(-50%, -50%);
+    border-width: 6px 6px 0 6px;
+    border-style: solid;
+    border-color: rgba(5, 5, 10, 0.95) transparent transparent transparent;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.12s ease-out;
+}
+
+/* Show tooltip on hover */
+.badge-icon:hover::after,
+.badge-icon:hover::before {
+    opacity: 1;
+    scale: 1;
+    transform: translate(-50%, -100%);
+}
+
+/* =========================================================
+   COMMUNICATION SECTION CARDS
+========================================================= */
+
+/* Communication section container: vertical stack */
+.communication-container {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    max-width: 640px;
+    margin: 40px auto;
+}
+
+/* The main communication card */
+.comm-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+
+    padding: 18px 24px;
+    max-width: 520px;
+    width: 100%;
+
+    background: rgba(5, 5, 10, 0.95);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.8);
+
+    text-align: left;          /* override any center alignment */
+    cursor: pointer;
+
+    transition:
+        transform 0.15s ease-out,
+        box-shadow 0.15s ease-out,
+        border-color 0.15s ease-out,
+        background 0.15s ease-out;
+}
+
+.comm-card:hover {
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: 0 22px 50px rgba(0, 0, 0, 1);
+    border-color: rgba(120, 190, 255, 0.45);
+    background: radial-gradient(circle at top left,
+                rgba(120, 190, 255, 0.18),
+                rgba(5, 5, 10, 0.98));
+}
+
+/* Thumbnail on the left */
+.comm-thumb {
+    flex: 0 0 auto;
+    width: 56px;
+    height: 56px;
+    border-radius: 18px;
+    background: #11121c;
     display: flex;
     align-items: center;
-    gap: 6px;
-    font-size: 15px;
+    justify-content: center;
+    box-shadow: 0 0 14px rgba(120, 190, 255, 0.35);
+}
+
+.comm-thumb-img {
+    width: 34px;
+    height: 34px;
+    object-fit: contain;
+}
+
+/* Text on the right */
+.comm-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.comm-title {
+    font-size: 1.1rem;
     font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
 }
 
-.view-icon {
-    width: 30px;
-    height: 30px;
-    opacity: 0.8;
-}
-.icon-tooltip {
-    position: relative;
-    display: inline-block;
-}
-.icon-tooltip::after {
-    content: attr(data-tip);
-    position: absolute;
-    bottom: 130%;
-    left: 50%;
-    transform: translateX(-50%) translateY(10px);
-    background: rgba(0, 0, 0, 0.8);
-    padding: 6px 12px;
-    border-radius: 4px;
-    font-size: 12px;
-    opacity: 0;
-    transition: all 0.25s ease;
+/* caret showing it's expandable */
+.comm-title::after {
+    content: "▾";
+    font-size: 0.8rem;
+    opacity: 0.7;
+    margin-left: 4px;
+    transition: transform 0.18s ease-out, opacity 0.18s ease-out;
 }
 
-.icon-tooltip:hover::after {
+.comm-card.comm-expanded .comm-title::after {
+    transform: rotate(180deg);
     opacity: 1;
-    transform: translateX(-50%) translateY(0);
+}
+
+.comm-description {
+    font-size: 0.9rem;
+    color: #b3b3c5;
+    max-width: 430px;
+}
+
+/* Small pill tag next to title (Main Hub, Code, Games, etc.) */
+.comm-tag {
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(10, 10, 20, 0.9);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+/* =========================================================
+   ACCORDION COLLAPSIBLE AREA
+========================================================= */
+
+/* Start collapsed */
+.comm-extra {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+    transform: translateY(4px);
+    transition:
+        max-height 0.25s ease-out,
+        opacity 0.2s ease-out,
+        transform 0.2s ease-out;
+}
+
+/* When the card is expanded */
+.comm-card.comm-expanded .comm-extra {
+    max-height: 200px; /* adjust if more text */
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+/* Open button inside expanded content */
+.comm-open-btn {
+    margin-top: 8px;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: #181a24;
+    color: #f5f5f5;
+    cursor: pointer;
+
+    transition:
+        background 0.15s ease-out,
+        border-color 0.15s ease-out,
+        transform 0.12s ease-out,
+        box-shadow 0.15s ease-out;
+}
+
+.comm-open-btn:hover {
+    background: #25293b;
+    border-color: rgba(120, 190, 255, 0.8);
+    box-shadow: 0 0 12px rgba(120, 190, 255, 0.45);
+    transform: translateY(-1px);
+}
+
+.comm-open-btn:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+/* =========================================================
+   SERVICE-SPECIFIC BORDERS
+========================================================= */
+
+/* Discord border styling */
+.comm-card[data-link*="discord"] {
+    border: 2px solid rgba(88, 101, 242, 0.75);
+    box-shadow: 0 0 16px rgba(88, 101, 242, 0.45);
+}
+
+.comm-card[data-link*="discord"]:hover {
+    border-color: rgba(88, 101, 242, 1);
+    box-shadow: 0 0 24px rgba(88, 101, 242, 0.8);
+}
+
+/* GitHub border styling */
+.comm-card[data-link*="github"] {
+    border: 2px solid rgba(200, 200, 200, 0.4);
+    box-shadow: 0 0 14px rgba(200, 200, 200, 0.18);
+}
+
+.comm-card[data-link*="github"]:hover {
+    border-color: rgba(255, 255, 255, 0.7);
+    box-shadow: 0 0 22px rgba(255, 255, 255, 0.35);
+}
+
+/* Roblox border styling */
+.comm-card[data-link*="roblox"] {
+    border: 2px solid rgba(255, 50, 50, 0.7);
+    box-shadow: 0 0 14px rgba(255, 50, 50, 0.35);
+}
+
+.comm-card[data-link*="roblox"]:hover {
+    border-color: rgba(255, 75, 75, 1);
+    box-shadow: 0 0 26px rgba(255, 50, 50, 0.7);
+}
+
+/* =========================================================
+   Communication Slide-in Animation
+========================================================= */
+
+/* Initial hidden state for comm cards */
+#communication .comm-card {
+    opacity: 0;
+    transform: translateY(12px);
+}
+
+/* When activated via JS, they slide in */
+#communication .comm-card.comm-visible {
+    animation: comm-slide-in 0.4s ease-out forwards;
+}
+
+@keyframes comm-slide-in {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+@media (max-width: 600px) {
+    .communication-container {
+        margin-top: 24px;
+        padding: 0 12px;
+    }
+
+    .comm-card {
+        padding: 14px 16px;
+        border-radius: 16px;
+    }
+
+    .comm-thumb {
+        width: 48px;
+        height: 48px;
+        border-radius: 16px;
+    }
+
+    .comm-thumb-img {
+        width: 28px;
+        height: 28px;
+    }
+
+    .comm-title {
+        font-size: 0.95rem;
+    }
+
+    .comm-description {
+        font-size: 0.8rem;
+        max-width: 100%;
+    }
+
+    .comm-open-btn {
+        font-size: 0.78rem;
+        padding: 5px 10px;
+    }
+}
+@media (max-width: 600px) {
+  .card-expanded-content {
+    padding: 18px 18px 16px;
+  }
+
+  .discord-section {
+    font-size: 0.85rem;
+  }
 }

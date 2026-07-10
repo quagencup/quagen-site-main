@@ -164,36 +164,104 @@
         }
         
         .credit-link {
-    display: inline-block;
-    opacity: 0.5;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    text-decoration: none;
-    position: relative;
+            display: inline-block;
+            opacity: 0.5;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            text-decoration: none;
+            position: relative;
 }
 
-.credit-link:hover {
-    opacity: 1;
-    transform: scale(1.1);
+        .credit-link:hover {
+            opacity: 1;
+            transform: scale(1.1);
+}       
+
+        .credit-link::after {
+            content: 'Made by Quagen';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            white-space: nowrap;
+            margin-bottom: 5px;
 }
 
-.credit-link::after {
-    content: 'Made by Quagen';
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-size: 12px;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    pointer-events: none;
-    white-space: nowrap;
-    margin-bottom: 5px;
+        .credit-link:hover::after {
+            opacity: 1;
 }
+/* =========================================
+   MOBILE TWEAKS (hero + header + layout)
+========================================= */
+@media (max-width: 600px) {
+    header {
+        padding: 12px 8px;
+    }
 
-.credit-link:hover::after {
-    opacity: 1;
+    header h1 {
+        font-size: 1.6rem;
+        margin-bottom: 6px;
+    }
+
+    nav {
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    nav a {
+        font-size: 0.85rem;
+        padding: 0.2rem 0.5rem;
+    }
+
+    main {
+        align-items: flex-start;
+        padding-top: 40px;
+    }
+
+    .main-icon {
+        width: 260px;
+        height: 260px;
+        top: 35%;
+    }
+
+    .subtitle {
+        top: calc(55% + 40px);
+        font-size: 0.85rem;
+        padding: 0 1rem;
+    }
+
+    footer {
+        padding-top: 0.5rem;
+        margin-bottom: 0.75rem;
+    }
+}
+@media (max-width: 480px) {
+  .container {
+    gap: 120px;
+    margin-top: 60px;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 320px;
+    padding: 16px;
+    padding-top: 56px;
+  }
+
+  .profile-img {
+    width: 110px;
+    height: 110px;
+    top: -70px;
+  }
+
+  .name-title {
+    font-size: 1rem;
+  }
 }

@@ -1,68 +1,28 @@
-class AudioManager {
-    constructor() {
-        this.anthem = new Audio('replace with github link after upload');
-        this.anthem.loop = true;
-        this.anthem.volume = 20; // Set anthem volume to 20%
-        this.isMuted = false;
-        this.isInitialized = false;
-        this.init();
-    }
-
-    init() {
-        this.createMuteButton();
-        
-        // Initialize audio on first user interaction
-        document.addEventListener('click', () => this.initAudio(), { once: true });
-    }
-    
-    createMuteButton() {
-        const muteButton = document.createElement('button');
-        muteButton.className = 'mute-button';
-        muteButton.innerHTML = '🔊';
-        muteButton.title = 'Mute/Unmute Audio';
-        
-        muteButton.addEventListener('click', () => this.toggleMute());
-        document.body.appendChild(muteButton);
-        
-        this.muteButton = muteButton;
-    }
-    
-    initAudio() {
-        if (!this.isInitialized) {
-            this.anthem.play().catch(error => {
-                console.log("Audio autoplay failed:", error);
-            });
-            this.isInitialized = true;
-        }
-    }
-    
-    toggleMute() {
-        this.isMuted = !this.isMuted;
-        
-        if (this.isMuted) {
-            this.anthem.pause();
-            this.muteButton.innerHTML = '🔇';
-            this.muteButton.classList.add('muted');
-            this.muteButton.title = 'Unmute Audio';
-        } else {
-            if (this.isInitialized) {
-                this.anthem.play().catch(error => {
-                    console.log("Audio play failed:", error);
-                });
-            }
-            this.muteButton.innerHTML = '🔊';
-            this.muteButton.classList.remove('muted');
-            this.muteButton.title = 'Mute Audio';
-        }
-        
-        // Notify profile music player about mute state
-        if (window.profileMusicPlayer) {
-            window.profileMusicPlayer.setMuted(this.isMuted);
-        }
-    }
-    
-    getMuteState() {
-        return this.isMuted;
-    }
-}
-
+window.QUAGEN_PLAYLIST = [
+  { src: "assets/songs/Anthem.mp3", cover: "assets/covers/anthem.jpg" },
+  { src: "assets/songs/Capella Grey - _Gyalis_.mp3", cover: "assets/covers/Capella Grey - _Gyalis_.jpg" },
+  { src: "assets/songs/FattMack - Lunch Break Freestyle.mp3", cover: "assets/covers/FattMack - Lunch Break Freestyle.jpg" },
+  { src: "assets/songs/G Herbo - Went Legit.mp3", cover: "assets/covers/G Herbo - Went Legit.jpg" },
+  { src: "assets/songs/Gunna - wgft (feat. Burna Boy).mp3", cover: "assets/covers/Gunna - wgft (feat. Burna Boy).jpg" },
+  { src: "assets/songs/Hurricane Wisdom - My Life.mp3", cover: "assets/covers/Hurricane Wisdom - My Life.jpg" },
+  { src: "assets/songs/Hurricane Wisdom - Pray.mp3", cover: "assets/covers/Hurricane Wisdom - Pray.jpg" },
+  { src: "assets/songs/Hurricane Wisdom - Rich Dropout.mp3", cover: "assets/covers/Hurrciane Wisdom - Rich Dropout.jpg" },
+  { src: "assets/songs/Jace! - Do Nun For Ya.mp3", cover: "assets/covers/Jace! - Do Nun For Ya.jpg" },
+  { src: "assets/songs/Jace! - Love Ya' More!.mp3", cover: "assets/covers/Jace! - Love Ya'More!.jpg" },
+  { src: "assets/songs/Jace! - Still Breathin!.mp3", cover: "assets/covers/Jace! - Still Breathin!.jpg" },
+  { src: "assets/songs/Lil Durk - What Happened to Virgil ft. Gunna.mp3", cover: "assets/covers/Lil Durk - What Happen To Virgil ft. Gunna.jpg" },
+  { src: "assets/songs/Lil Tony - Watch The Moon.mp3", cover: "assets/covers/Lil Tony - Watch The Moon.jpg" },
+  { src: "assets/songs/Lil Uzi Vert - What You Saying.mp3", cover: "assets/covers/Lil Uzi Vert - What You Saying.jpg" },
+  { src: "assets/songs/mofe. - Prince Of Egypt.mp3", cover: "assets/covers/mofe. - Prince Of Egypt.jpg" },
+  { src: "assets/songs/Nino Paid - Tree On The Hill.mp3", cover: "assets/covers/Nino Paid - Tree On The Hill.jpg" },
+  { src: "assets/songs/PlaqueBoyMax x DDG - Pink Dreads.mp3", cover: "assets/covers/PlaqueBoyMax x DDG - Pink Dreads.jpg" },
+  { src: "assets/songs/Raq baby - DoorDash (OMG).mp3", cover: "assets/covers/Raq Baby - Doordash (OMG).jpg" },
+  { src: "assets/songs/SoFaygo - MM3.mp3", cover: "assets/covers/SoFaygo - MM3.jpg" },
+  { src: "assets/songs/Sturdyyoungin, Ohthatsmizz & Zeddy Will - TRIPPIN.mp3", cover: "assets/covers/Sturdyyoungin, Ohthatsmizz & Zeddy Will - TRIPPIN.jpg" },
+  { src: "assets/songs/Baby Qato Ft Vonno - Flu Game¿.mp3", cover: "assets/covers/qato.jpg" },
+  { src: "assets/songs/BabyChiefDoIt - Ghetto Love Story.mp3", cover: "assets/covers/qato.jpg" },
+  { src: "assets/songs/Boobeyy - Party In My House.mp3", cover: "assets/covers/qato.jpg" },
+  { src: "assets/songs/Boobeyy Ft SafeHuntin - GLE.mp3", cover: "assets/covers/qato.jpg" },
+  { src: "assets/songs/Cheif Dooka Ft Lil Kujo- Ride With Me.mp3", cover: "assets/covers/qato.jpg" },
+  { src: "assets/songs/Chief Dooka  -  Disses To Everybody.mp3", cover: "assets/covers/qato.jpg" },
+];
