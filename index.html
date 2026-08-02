@@ -244,91 +244,111 @@
 (function(){
   const canvas = document.getElementById('bg-canvas');
   const ctx = canvas.getContext('2d');
-  let W, H;
+
+  // low-res buffer we compute the flow field on, then upscale (blurred) for performance
+  const buffer = document.createElement('canvas');
+  const bctx = buffer.getContext('2d');
+  const SCALE = 0.12;
+
+  let W, H, bw, bh, imgData, data;
 
   function resize(){
     W = canvas.width = window.innerWidth;
     H = canvas.height = window.innerHeight;
+    bw = buffer.width = Math.max(2, Math.floor(W * SCALE));
+    bh = buffer.height = Math.max(2, Math.floor(H * SCALE));
+    imgData = bctx.createImageData(bw, bh);
+    data = imgData.data;
+    ctx.imageSmoothingEnabled = true;
   }
   window.addEventListener('resize', resize);
   resize();
 
   let mouseX = W/2, mouseY = H/2;
   let targetX = mouseX, targetY = mouseY;
-  let hoverStrength = 0, targetStrength = 0;
+  let hover = 0, targetHover = 0;
 
   window.addEventListener('mousemove', e=>{
     targetX = e.clientX;
     targetY = e.clientY;
-    targetStrength = 1;
+    targetHover = 1;
   });
-  window.addEventListener('mouseleave', ()=>{ targetStrength = 0; });
+  window.addEventListener('mouseleave', ()=>{ targetHover = 0; });
   window.addEventListener('touchmove', e=>{
     if(e.touches[0]){
       targetX = e.touches[0].clientX;
       targetY = e.touches[0].clientY;
-      targetStrength = 1;
+      targetHover = 1;
     }
   }, {passive:true});
 
-  const waves = [
-    { color:'#8B2FF5', baseY:0.30, amp:0.10, freq:1.1, speed: 0.06, phase:0.0, alpha:0.55 },
-    { color:'#3DFF9A', baseY:0.48, amp:0.12, freq:0.8, speed:-0.045, phase:1.4, alpha:0.5 },
-    { color:'#C24CFF', baseY:0.62, amp:0.09, freq:1.4, speed: 0.07, phase:3.1, alpha:0.5 },
-    { color:'#F6F7F9', baseY:0.40, amp:0.07, freq:1.0, speed:-0.05, phase:0.7, alpha:0.28 },
-    { color:'#1FBD73', baseY:0.72, amp:0.11, freq:1.25,speed: 0.055,phase:2.2, alpha:0.55 }
+  // cyclic fluorescent palette: black -> purple -> green -> white -> green -> purple -> black
+  const stops = [
+    { p:0.00, c:[5,5,5] },
+    { p:0.16, c:[139,47,245] },
+    { p:0.34, c:[194,76,255] },
+    { p:0.50, c:[61,255,154] },
+    { p:0.62, c:[246,247,249] },
+    { p:0.80, c:[31,189,115] },
+    { p:1.00, c:[5,5,5] }
   ];
+  function palette(v){
+    v = v - Math.floor(v); // wrap 0..1
+    for(let i=0; i<stops.length-1; i++){
+      const a = stops[i], b = stops[i+1];
+      if(v >= a.p && v <= b.p){
+        const f = (v - a.p) / (b.p - a.p);
+        return [
+          a.c[0] + (b.c[0]-a.c[0])*f,
+          a.c[1] + (b.c[1]-a.c[1])*f,
+          a.c[2] + (b.c[2]-a.c[2])*f
+        ];
+      }
+    }
+    return stops[0].c;
+  }
 
   let t = 0;
 
   function draw(){
-    t += 0.012;
+    t += 0.006;
+    mouseX += (targetX - mouseX) * 0.05;
+    mouseY += (targetY - mouseY) * 0.05;
+    hover += (targetHover - hover) * 0.04;
 
-    mouseX += (targetX - mouseX) * 0.06;
-    mouseY += (targetY - mouseY) * 0.06;
-    hoverStrength += (targetStrength - hoverStrength) * 0.05;
+    const mx = (mouseX / W) * bw;
+    const my = (mouseY / H) * bh;
 
-    ctx.globalCompositeOperation = 'source-over';
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = '#050505';
-    ctx.fillRect(0, 0, W, H);
+    let idx = 0;
+    for(let y = 0; y < bh; y++){
+      for(let x = 0; x < bw; x++){
+        // layered sine waves flowing across the whole field
+        let v = 0;
+        v += Math.sin(x * 0.09 + t * 1.4);
+        v += Math.sin(y * 0.14 - t * 1.1);
+        v += Math.sin((x + y) * 0.05 + t * 0.8);
+        v += Math.sin((x - y) * 0.07 - t * 1.6);
 
-    ctx.globalCompositeOperation = 'screen';
-
-    waves.forEach((w, i)=>{
-      w.phase += w.speed * 0.02;
-
-      ctx.beginPath();
-      ctx.moveTo(0, H);
-
-      const step = Math.max(6, W / 160);
-      for(let x = 0; x <= W; x += step){
-        const nx = x / W;
-
-        const dx = x - mouseX;
-        const dy = (w.baseY * H) - mouseY;
+        // ripple that flares up + distorts the flow near the cursor (collision effect)
+        const dx = x - mx, dy = y - my;
         const dist = Math.sqrt(dx*dx + dy*dy);
+        v += hover * Math.sin(dist * 0.35 - t * 6) * Math.exp(-dist / 22) * 3;
 
-        // colors collide + surge near the cursor
-        const collision = hoverStrength * Math.exp(-(dist*dist) / (2*220*220))
-                           * (140 + 60*Math.sin(t*4 + i*1.7));
+        const n = (v / 4 + 1) / 2 + t * 0.02; // normalize + slow overall drift
+        const [r,g,b] = palette(n);
 
-        const wave = Math.sin(nx * Math.PI * 2 * w.freq + w.phase * 6.283) * w.amp * H;
-
-        const y = w.baseY * H + wave + collision;
-        ctx.lineTo(x, y);
+        data[idx++] = r;
+        data[idx++] = g;
+        data[idx++] = b;
+        data[idx++] = 255;
       }
+    }
 
-      ctx.lineTo(W, H);
-      ctx.closePath();
-
-      ctx.globalAlpha = w.alpha + hoverStrength * 0.15;
-      ctx.fillStyle = w.color;
-      ctx.fill();
-    });
-
-    ctx.globalAlpha = 1;
-    ctx.globalCompositeOperation = 'source-over';
+    bctx.putImageData(imgData, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    ctx.filter = 'blur(6px)';
+    ctx.drawImage(buffer, 0, 0, bw, bh, 0, 0, W, H);
+    ctx.filter = 'none';
 
     requestAnimationFrame(draw);
   }
