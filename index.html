@@ -1,1255 +1,340 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Under Development — Website Overhaul</title>
+<style>
+  :root{
+    --black:#050505;
+    --purple:#8B2FF5;
+    --purple-hot:#C24CFF;
+    --green:#3DFF9A;
+    --green-dim:#1FBD73;
+    --white:#F6F7F9;
+  }
 
-  <!-- Single Page Apps for GitHub Pages
-       https://github.com/rafgraph/spa-github-pages
-       Decodes the path 404.html re-encoded (e.g. /@quagen) back
-       into a real URL via history.replaceState, before any other
-       script runs, so js/about-overlay.js's deep-link check sees
-       the correct window.location.pathname. -->
-  <script>
-    (function (l) {
-      if (l.search[1] === "/") {
-        var decoded = l.search.slice(1).split("&").map(function (s) {
-          return s.replace(/~and~/g, "&");
-        }).join("?");
-        window.history.replaceState(null, null,
-          l.pathname.slice(0, -1) + decoded + l.hash
-        );
-      }
-    })(window.location);
-  </script>
+  *{box-sizing:border-box; margin:0; padding:0;}
 
-  <title>quagen.lol - Official Website</title>
-  <link rel="icon" href="assets/spill.png" />
+  html,body{
+    height:100%;
+    background:var(--black);
+    font-family:'Segoe UI', 'Inter', -apple-system, sans-serif;
+    color:var(--white);
+    overflow-x:hidden;
+    scroll-behavior:smooth;
+  }
 
-  <link rel="stylesheet" href="css/site.css" />
+  /* ---------- flowing wave background ---------- */
+  #bg-canvas{
+    position:fixed;
+    inset:0;
+    z-index:-1;
+    display:block;
+    width:100vw;
+    height:100vh;
+    background:var(--black);
+  }
 
-  <meta property="og:title" content="Quagen" />
-  <meta property="og:description" content="Website created for the Project: Quagen Studios" />
-  <meta property="og:image" content="assets/spill.png" />
-  
-<script src="js/section.js" defer></script>
+  /* ---------- HERO SECTION ---------- */
+  .hero{
+    position:relative;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:24px;
+  }
 
-  <script src="js/translations.js" defer></script>
-  <script src="js/i18n.js" defer></script>
-  <script src="js/lang-dropdown.js" defer></script>
-  <script src="js/oneko.js" defer></script>
-  <script src="js/audio.js" defer></script>
-  <script src="js/profile-music.js" defer></script>
-  <script src="js/about-overlay.js" defer></script>
+  .eyebrow{
+    font-size:12px;
+    letter-spacing:0.35em;
+    text-transform:uppercase;
+    color:var(--green);
+    margin-bottom:28px;
+    opacity:0.9;
+  }
+  .eyebrow::before{
+    content:'◆ ';
+    color:var(--purple-hot);
+  }
+
+  .headline{
+    font-size:clamp(2.6rem, 8vw, 5.5rem);
+    font-weight:800;
+    letter-spacing:-0.02em;
+    line-height:1.02;
+    color:var(--white);
+    text-shadow: 0 0 60px rgba(194,76,255,0.35);
+  }
+
+  .subtitle{
+    margin-top:22px;
+    font-size:clamp(1.1rem, 2.6vw, 1.5rem);
+    color:var(--green);
+    font-weight:400;
+    letter-spacing:0.02em;
+  }
+  .subtitle .label{
+    font-size:0.6em;
+    letter-spacing:0.2em;
+    color:rgba(246,247,249,0.5);
+    display:block;
+    margin-top:6px;
+    text-transform:uppercase;
+  }
+
+  /* ---------- Loading compass ---------- */
+  .loader-wrap{
+    margin-top:56px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:16px;
+  }
+
+  .compass{
+    width:64px;
+    height:64px;
+    animation: spin 3.2s linear infinite;
+    transform-origin:center;
+    filter: drop-shadow(0 0 10px rgba(61,255,154,0.5));
+  }
+  @keyframes spin{
+    0%{ transform:rotate(0deg); }
+    100%{ transform:rotate(360deg); }
+  }
+  .compass .needle{
+    animation: pulse 1.6s ease-in-out infinite;
+    transform-origin: 32px 32px;
+  }
+  @keyframes pulse{
+    0%,100%{ opacity:1; }
+    50%{ opacity:0.4; }
+  }
+
+  .progress-text{
+    font-size:12px;
+    letter-spacing:0.2em;
+    color:rgba(246,247,249,0.55);
+    text-transform:uppercase;
+  }
+  .progress-text span{
+    color:var(--purple-hot);
+  }
+
+  .scroll-cue{
+    position:absolute;
+    bottom:52px;
+    left:50%;
+    transform:translateX(-50%);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:8px;
+    font-size:10px;
+    letter-spacing:0.3em;
+    color:rgba(246,247,249,0.5);
+    text-transform:uppercase;
+    animation: floatY 2.2s ease-in-out infinite;
+  }
+  @keyframes floatY{
+    0%,100%{ transform:translate(-50%,0); }
+    50%{ transform:translate(-50%,8px); }
+  }
+  .scroll-cue svg{ width:16px; height:16px; }
+
+  /* ---------- COMING SOON SECTION ---------- */
+  .coming{
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    position:relative;
+  }
+
+  .coming-label{
+    font-size:12px;
+    letter-spacing:0.35em;
+    text-transform:uppercase;
+    color:rgba(246,247,249,0.5);
+    margin-bottom:20px;
+  }
+
+  .coming-big{
+    font-size:clamp(3rem, 12vw, 9rem);
+    font-weight:800;
+    letter-spacing:-0.03em;
+    line-height:0.95;
+    background:linear-gradient(100deg, var(--purple-hot) 0%, var(--white) 50%, var(--green) 100%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+
+  .coming-sub{
+    margin-top:24px;
+    font-size:1rem;
+    color:rgba(246,247,249,0.6);
+    max-width:440px;
+    line-height:1.6;
+  }
+
+  .divider{
+    width:64px;
+    height:1px;
+    background:var(--green);
+    margin:32px auto 0;
+    opacity:0.8;
+  }
+</style>
 </head>
-
 <body>
-  
-  <header>
-    <h1 data-i18n="site-header">QUAGEN</h1>
-  </header>
 
-  <main>
-    <!-- =========================
-         ABOUT SECTION
-    ========================== -->
-    <section id="about" class="content-section active">
-      <div class="about-hero">
-        <div class="about-main-card about-main-card--portal"
-             id="aboutPortalTrigger"
-             role="button"
-             tabindex="0"
-             aria-haspopup="dialog"
-             aria-controls="aboutOverlay"
-             aria-label="Open Team, Projects &amp; Communications">
+  <canvas id="bg-canvas"></canvas>
 
-          <!-- Bordered portal image (decorative, whole card is clickable) -->
-          <div class="about-portal" aria-hidden="true">
-            <img src="assets/members/quagenpfp.png" alt="" class="about-portal-img">
-            <span class="about-portal-label" data-i18n="about.portal.cta">Click to Explore</span>
-          </div>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="eyebrow">Something new is forming</div>
+    <h1 class="headline">Under Development</h1>
+    <p class="subtitle">
+      Website Overhaul
+      <span class="label">Rebuilding, piece by piece</span>
+    </p>
 
-          <div class="about-main-text">
-            <h2 class="about-title" data-i18n="about.title">PROJECT Q (QUAGEN STUDIOS)</h2>
-            <p class="about-text" data-i18n="about.body">
-              Quagen Studios, referred to as Project Q, is an initiative designed to transform any creative concept into reality. This project compiles various development ideas that we intend to realize and present for public viewing or interaction. Our objective is to advance all developments and finalize any concepts that arise in our minds.
-
-              
-              Website Update Status: 3/31/26
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div class="about-extra-cards">
-        <article class="about-card">
-          <div class="about-card-thumb">
-            <img src="assets/members/quagenpfp.png" alt="Quagen Hub">
-          </div>
-          <div class="about-card-body">
-            <h3 class="about-card-title" data-i18n="about.cards.hub.title">QUAGEN STUDIOS HUB</h3>
-            <p class="about-card-description" data-i18n="about.cards.hub.desc">
-              Central place for games, tools, and experiments built under Project Q.
-            </p>
-            <a href="https://www.roblox.com/communities/527690210/Quagen-Studios"
-               target="_blank"
-               rel="noopener noreferrer"
-               class="about-card-link"
-               data-i18n="about.cards.hub.cta">
-              Visit Site
-            </a>
-          </div>
-        </article>
-
-        <article class="about-card">
-          <div class="about-card-thumb">
-            <img src="assets/members/quagenpfp.png" alt="Team, Projects & Communications">
-          </div>
-          <div class="about-card-body">
-            <h3 class="about-card-title" data-i18n="about.cards.teams.title">TEAM, PROJECTS &amp; COMMS</h3>
-            <p class="about-card-description" data-i18n="about.cards.teams.desc">
-              Meet the founders and staff, explore every project, and find every way to connect — all in one place.
-            </p>
-            <button type="button" class="about-card-link about-card-link--btn" data-open-portal data-i18n="about.cards.teams.cta">
-              Explore
-            </button>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <!-- =========================
-         ABOUT OVERLAY
-         (Founders -> Mods -> Admins -> Project Managers ->
-          Developers -> Testers -> Projects -> Communications)
-         Opened by clicking the portal image above.
-    ========================== -->
-    <div class="about-overlay" id="aboutOverlay" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="aboutOverlayTitle">
-      <div class="about-overlay-scrim" data-close-overlay></div>
-
-      <div class="about-overlay-panel">
-        <div class="about-overlay-topbar">
-          <span id="aboutOverlayTitle" class="about-overlay-title">Quagen Studios</span>
-          <button type="button" class="about-overlay-close" data-close-overlay aria-label="Close">✕</button>
-        </div>
-
-        <div class="about-overlay-scroll" id="aboutOverlayScroll">
-
-          <!-- FOUNDERS -->
-          <section class="ov-section" id="ov-founders">
-            <h2 class="ov-heading" data-i18n="overlay.founders">Founders</h2>
-            <div class="container teams-cards ov-cards">
-
-              <div class="card"
-                   data-display="@quagen"
-                   data-music="assets/songs/Profile-Songs/quagen-theme.mp3"
-                   data-description="Founder of Quagen Studios. Building games, tools, and experiences."
-                   data-roles="Founder">
-                <div class="profile">
-                  <img src="assets/members/quagenpfp.png" alt="quagen" class="profile-img">
-                  <div class="name-tag">
-                    <h2 class="name-title">
-                      <span data-i18n="founder.cards.quagen.handle">@quagen</span>
-                      <span class="role-badges">
-                        <img src="assets/badgeicons/ownerbadge.png" alt="Owner" class="badge-icon badge-owner" data-badge-label="Owner">
-                      </span>
-                    </h2>
-                    <span class="role-tag owner" data-i18n="founder.cards.quagen.role">Project Lead</span>
-                  </div>
-                </div>
-                <div class="social-links">
-                  <a href="https://discordapp.com/users/518833554524995584" class="social-link" target="_blank" rel="noopener noreferrer"><img src="assets/socials/discord.svg" alt="Discord"></a>
-                  <a href="https://www.roblox.com/users/7011631139/profile" class="social-link" target="_blank" rel="noopener noreferrer"><img src="assets/socials/roblox.svg" alt="Roblox"></a>
-                  <a href="https://www.tiktok.com/@xenonfy" class="social-link" target="_blank" rel="noopener noreferrer"><img src="assets/socials/tiktok.svg" alt="tiktok"></a>
-                </div>
-                <div class="chevron">▼</div>
-              </div>
-
-              <div class="card"
-                   data-display="@cake"
-                   data-music="assets/songs/Profile-Songs/cake-theme.mp3"
-                   data-description="Cake — Co-Founder & Lead Developer at Quagen Studios."
-                   data-roles="Co-Founder">
-                <div class="profile">
-                  <img src="assets/members/cakepfp.png" alt="cake" class="profile-img">
-                  <div class="name-tag">
-                    <h2 class="name-title">
-                      <span data-i18n="founder.cards.cake.handle">@cake</span>
-                      <span class="role-badges">
-                        <img src="assets/badgeicons/ownerbadge.png" alt="Owner" class="badge-icon badge-owner" data-badge-label="Owner">
-                      </span>
-                    </h2>
-                    <span class="role-tag owner" data-i18n="founder.cards.cake.role">Project Lead</span>
-                  </div>
-                </div>
-                <div class="social-links">
-                  <a href="https://discordapp.com/users/1078313475727691787" class="social-link" target="_blank" rel="noopener noreferrer"><img src="assets/socials/discord.svg" alt="Discord"></a>
-                  <a href="https://www.roblox.com/users/178248663/profile" class="social-link" target="_blank" rel="noopener noreferrer"><img src="assets/socials/roblox.svg" alt="Roblox"></a>
-                  <a href="https://github.com/cachedcake" class="social-link" target="_blank" rel="noopener noreferrer"><img src="assets/socials/github.svg" alt="github"></a>
-                </div>
-                <div class="chevron">▼</div>
-              </div>
-
-            </div>
-          </section>
-
-          <!-- MODERATORS -->
-          <section class="ov-section" id="ov-mods">
-            <h2 class="ov-heading" data-i18n="overlay.mods">Moderators</h2>
-            <div class="container teams-cards ov-cards">
-
-              <div class="card" data-display="@u5urp" data-music="assets/songs/Profile-Songs/mist-theme.mp3" data-description="Moderator at Quagen Studios. Helps manage the community and maintain order.">
-                <div class="profile">
-                  <img src="assets/members/mistpfp.png" alt="Moderator" class="profile-img">
-                  <div class="name-tag">
-                    <h2 class="name-title">
-                      <span data-i18n="teams.cards.mod1.handle">@u5urp</span>
-                      <span class="role-badges"><img src="assets/extraicons/modicon.png" alt="Staff" class="badge-icon badge-staff" data-badge-label="Moderator"></span>
-                    </h2>
-                    <span class="role-tag mod" data-i18n="teams.cards.mod1.role">Game Moderator</span>
-                  </div>
-                </div>
-                <div class="social-links">
-                  <a href="https://discordapp.com/users/701708650510548992" class="social-link" target="_blank" rel="noopener noreferrer"><img src="assets/socials/discord.svg" alt="Discord"></a>
-                </div>
-                <div class="chevron">▼</div>
-              </div>
-
-              <div class="card" data-display="@critic1sm" data-music="assets/songs/Profile-Songs/critic-theme.mp3" data-description="Moderator at Quagen Studios. Helps manage the community and maintain order.">
-                <div class="profile">
-                  <img src="assets/members/criticpfp.png" alt="Moderator" class="profile-img">
-                  <div class="name-tag">
-                    <h2 class="name-title">
-                      <span data-i18n="teams.cards.mod2.handle">@critic1sm</span>
-                      <span class="role-badges"><img src="assets/extraicons/modicon.png" alt="Staff" class="badge-icon badge-staff" data-badge-label="Moderator"></span>
-                    </h2>
-                    <span class="role-tag mod" data-i18n="teams.cards.mod2.role">Game Moderator</span>
-                  </div>
-                </div>
-                <div class="social-links">
-                  <a href="https://discordapp.com/users/1118282865440985198" class="social-link" target="_blank" rel="noopener noreferrer"><img src="assets/socials/discord.svg" alt="Discord"></a>
-                </div>
-                <div class="chevron">▼</div>
-              </div>
-
-              <div class="card" data-display="@.y3614" data-music="assets/songs/Profile-Songs/pure-theme.mp3" data-description="I’m .y3614, Moderator at Quagen. DMs open for questions, not nonsense — common sense required.">
-                <div class="profile">
-                  <img src="assets/members/purepfp.png" alt="Moderator" class="profile-img">
-                  <div class="name-tag">
-                    <h2 class="name-title">
-                      <span data-i18n="teams.cards.mod2.handle">@.y3614</span>
-                      <span class="role-badges"><img src="assets/extraicons/modicon.png" alt="Staff" class="badge-icon badge-staff" data-badge-label="Moderator"></span>
-                    </h2>
-                    <span class="role-tag mod" data-i18n="teams.cards.mod2.role">Game Moderator</span>
-                  </div>
-                </div>
-                <div class="social-links">
-                  <a href="https://discordapp.com/users/1251995412286541829" class="social-link" target="_blank" rel="noopener noreferrer"><img src="assets/socials/discord.svg" alt="Discord"></a>
-                </div>
-                <div class="chevron">▼</div>
-              </div>
-
-            </div>
-          </section>
-
-          <!-- ADMINS -->
-          <section class="ov-section" id="ov-admins">
-            <h2 class="ov-heading" data-i18n="overlay.admins">Admins</h2>
-            <div class="container teams-cards ov-cards">
-              <div class="card" data-display="@adminname" data-music="assets/songs/Profile-Songs/pickle-theme.mp3" data-description="Admin at Quagen Studios. Oversees staff operations and advanced moderation.">
-                <div class="profile">
-                  <img src="assets/members/picklepfp.jpg" alt="Admin" class="profile-img">
-                  <div class="name-tag">
-                    <h2 class="name-title">
-                      <span data-i18n="teams.cards.admin1.handle">@vrmu</span>
-                      <span class="role-badges"><img src="assets/extraicons/adminicon.png" alt="Admin" class="badge-icon badge-admin" data-badge-label="Admin"></span>
-                    </h2>
-                    <span class="role-tag admin" data-i18n="teams.cards.admin1.role">Administrator</span>
-                  </div>
-                </div>
-                <div class="social-links">
-                  <a href="https://discordapp.com/users/ADMIN_DISCORD_ID" class="social-link" target="_blank" rel="noopener noreferrer"><img src="assets/socials/discord.svg" alt="Discord"></a>
-                </div>
-                <div class="chevron">▼</div>
-              </div>
-            </div>
-          </section>
-
-          <!-- PROJECT MANAGERS -->
-          <section class="ov-section" id="ov-pms">
-            <h2 class="ov-heading" data-i18n="overlay.pms">Project Managers</h2>
-            <div class="container teams-cards ov-cards">
-              <div class="card" data-display="@pmname" data-music="assets/songs/Profile-Songs/pm-theme.mp3" data-description="Project Manager at Quagen Studios. Coordinates timelines, priorities, and releases.">
-                <div class="profile">
-                  <img src="assets/members/quagenpfp.png" alt="Project Manager" class="profile-img">
-                  <div class="name-tag">
-                    <h2 class="name-title">
-                      <span data-i18n="teams.cards.pm1.handle">@quagencup</span>
-                      <span class="role-badges"><img src="assets/badgeicons/ownerbadge.png" alt="Owner" class="badge-icon badge-manager" data-badge-label="Project Owner"></span>
-                    </h2>
-                    <span class="role-tag pm" data-i18n="teams.cards.pm1.role">Project </span>
-                  </div>
-                </div>
-                <div class="social-links">
-                  <a href="https://discordapp.com/users/PM_DISCORD_ID" class="social-link" target="_blank" rel="noopener noreferrer"><img src="assets/socials/discord.svg" alt="Discord"></a>
-                </div>
-                <div class="chevron">▼</div>
-              </div>
-            </div>
-          </section>
-
-          <!-- DEVELOPERS -->
-          <section class="ov-section" id="ov-devs">
-            <h2 class="ov-heading" data-i18n="overlay.devs">Developers</h2>
-            <div class="container teams-cards ov-cards">
-              <div class="card" data-display="@devname" data-music="assets/songs/Profile-Songs/dev-theme.mp3" data-description="Developer at Quagen Studios. Works on gameplay systems, UI, and tools.">
-                <div class="profile">
-                  <img src="assets/members/defaultpfp.png" alt="Developer" class="profile-img">
-                  <div class="name-tag">
-                    <h2 class="name-title">
-                      <span data-i18n="teams.cards.dev1.handle">@DevName</span>
-                      <span class="role-badges"><img src="assets/badgeicons/staffbadge.png" alt="Developer" class="badge-icon badge-developer" data-badge-label="Developer"></span>
-                    </h2>
-                    <span class="role-tag dev" data-i18n="teams.cards.dev1.role">Senior Developer</span>
-                  </div>
-                </div>
-                <div class="social-links">
-                  <a href="https://discordapp.com/users/DEV_DISCORD_ID" class="social-link" target="_blank" rel="noopener noreferrer"><img src="assets/socials/discord.svg" alt="Discord"></a>
-                </div>
-                <div class="chevron">▼</div>
-              </div>
-            </div>
-          </section>
-
-          <!-- TESTERS -->
-          <section class="ov-section" id="ov-testers">
-            <h2 class="ov-heading" data-i18n="overlay.testers">Testers</h2>
-            <div class="container teams-cards ov-cards">
-              <div class="card" data-display="@testername" data-music="assets/songs/Profile-Songs/imari-theme.mp3" data-description="🎀 Tester at Quagen Studios. 🎀">
-                <div class="profile">
-                  <img src="assets/members/imaripfp.png" alt="Tester" class="profile-img">
-                  <div class="name-tag">
-                    <h2 class="name-title">
-                      <span data-i18n="teams.cards.tester1.handle">@imari</span>
-                      <span class="role-badges"><img src="assets/badgeicons/memberbadge.png" alt="Tester" class="badge-icon badge-member" data-badge-label="Tester"></span>
-                    </h2>
-                    <span class="role-tag tester" data-i18n="teams.cards.tester1.role">Q&amp;A Tester</span>
-                  </div>
-                </div>
-                <div class="social-links">
-                  <a href="https://discordapp.com/users/991444856079659110" class="social-link" target="_blank" rel="noopener noreferrer"><img src="assets/socials/discord.svg" alt="Discord"></a>
-                  <a href="https://www.roblox.com/users/1098522122/profile" class="social-link" target="_blank" rel="noopener noreferrer"><img src="assets/socials/roblox.svg" alt="Roblox"></a>
-                </div>
-                <div class="chevron">▼</div>
-              </div>
-            </div>
-          </section>
-
-          <!-- PROJECTS -->
-          <section class="ov-section" id="ov-projects">
-            <h2 class="ov-heading" data-i18n="overlay.projects">Projects</h2>
-
-            <div class="project-gallery">
-
-              <button type="button" class="project-tile" data-status="upcoming"
-                      data-title="Shooting Range"
-                      data-image="assets/socials/roblox.svg"
-                      data-desc="A fully-functional aim training map for testing weapons, recoil, and player improvement."
-                      data-developers="quagen, cake"
-                      data-contributors="Quagen Studios Team"
-                      data-link="https://www.roblox.com/communities/527690210/Quagen-Studios">
-                <span class="project-tile-thumb"><img src="assets/socials/roblox.svg" alt=""></span>
-                <span class="project-tile-title">SHOOTING RANGE</span>
-                <span class="project-tile-status">Upcoming</span>
-              </button>
-
-              <button type="button" class="project-tile" data-status="upcoming"
-                      data-title="Chicago Experience"
-                      data-image="assets/socials/roblox.svg"
-                      data-desc="A stylized open-world Chicago map with focus on layout, mood, and performance."
-                      data-developers="quagen, cake"
-                      data-contributors="Quagen Studios Team"
-                      data-link="https://www.roblox.com/communities/527690210/Quagen-Studios">
-                <span class="project-tile-thumb"><img src="assets/socials/roblox.svg" alt=""></span>
-                <span class="project-tile-title">CHICAGO EXPERIENCE</span>
-                <span class="project-tile-status">Upcoming</span>
-              </button>
-
-              <button type="button" class="project-tile" data-status="upcoming"
-                      data-title="Car & Building Showcase"
-                      data-image="assets/socials/roblox.svg"
-                      data-desc="A clean environment to show off vehicles, buildings, and visuals before they ship into main projects."
-                      data-developers="quagen, cake"
-                      data-contributors="Quagen Studios Team"
-                      data-link="https://www.roblox.com/communities/527690210/Quagen-Studios">
-                <span class="project-tile-thumb"><img src="assets/socials/roblox.svg" alt=""></span>
-                <span class="project-tile-title">CAR &amp; BUILDING SHOWCASE</span>
-                <span class="project-tile-status">Upcoming</span>
-              </button>
-
-              <button type="button" class="project-tile" data-status="upcoming"
-                      data-title="Guess The Rapper"
-                      data-image="assets/socials/roblox.svg"
-                      data-desc="A trivial game where you guess the rapper, and try to beat the game!"
-                      data-developers="quagen, cake"
-                      data-contributors="Quagen Studios Team"
-                      data-link="https://www.roblox.com/communities/527690210/Quagen-Studios">
-                <span class="project-tile-thumb"><img src="assets/socials/roblox.svg" alt=""></span>
-                <span class="project-tile-title">GUESS THE RAPPER</span>
-                <span class="project-tile-status">Upcoming</span>
-              </button>
-
-              <button type="button" class="project-tile" data-status="upcoming"
-                      data-title="Rythia"
-                      data-image="assets/socials/rhythiagame.svg"
-                      data-desc="An aim-based rhythm game where players use precise timing to hit musical beats represented by blocks on a 3x3 grid."
-                      data-developers="quagen, cake"
-                      data-contributors="Quagen Studios Team"
-                      data-link="https://www.roblox.com/communities/527690210/Quagen-Studios">
-                <span class="project-tile-thumb"><img src="assets/socials/rhythiagame.svg" alt=""></span>
-                <span class="project-tile-title">RYTHIA ROBLOX VERSION</span>
-                <span class="project-tile-status">Upcoming</span>
-              </button>
-
-            </div>
-          </section>
-
-          <!-- COMMUNICATIONS -->
-          <section class="ov-section ov-section--last" id="ov-comms">
-            <h2 class="ov-heading" data-i18n="overlay.comms">Communications</h2>
-
-            <div class="project-gallery">
-              <a class="project-tile" href="https://discord.gg/rMpkKrbtWY" target="_blank" rel="noopener noreferrer">
-                <span class="project-tile-thumb"><img src="assets/socials/discord.svg" alt=""></span>
-                <span class="project-tile-title" data-i18n="comms.cards.discord.title">Quagen Studios Discord</span>
-              </a>
-
-              <a class="project-tile" href="https://www.roblox.com/communities/527690210/Quagen-Studios" target="_blank" rel="noopener noreferrer">
-                <span class="project-tile-thumb"><img src="assets/socials/roblox.svg" alt=""></span>
-                <span class="project-tile-title" data-i18n="comms.cards.robloxGroup.title">Quagen Studios Roblox</span>
-              </a>
-
-              <a class="project-tile" href="https://www.roblox.com/users/7011631139/profile" target="_blank" rel="noopener noreferrer">
-                <span class="project-tile-thumb"><img src="assets/socials/roblox.svg" alt=""></span>
-                <span class="project-tile-title" data-i18n="comms.cards.robloxProfile.title">Follow My Roblox Profile</span>
-              </a>
-            </div>
-          </section>
-
-        </div>
-      </div>
+    <div class="loader-wrap">
+      <svg class="compass" viewBox="0 0 64 64" fill="none">
+        <circle cx="32" cy="32" r="28" stroke="#3DFF9A" stroke-width="1.5" opacity="0.5"/>
+        <circle cx="32" cy="32" r="2" fill="#C24CFF"/>
+        <g class="needle">
+          <line x1="32" y1="32" x2="32" y2="8" stroke="#C24CFF" stroke-width="2" stroke-linecap="round"/>
+          <line x1="32" y1="32" x2="32" y2="52" stroke="#3DFF9A" stroke-width="2" stroke-linecap="round"/>
+        </g>
+        <line x1="32" y1="6" x2="32" y2="12" stroke="#3DFF9A" stroke-width="1" opacity="0.6"/>
+        <line x1="32" y1="52" x2="32" y2="58" stroke="#3DFF9A" stroke-width="1" opacity="0.6"/>
+        <line x1="6" y1="32" x2="12" y2="32" stroke="#3DFF9A" stroke-width="1" opacity="0.6"/>
+        <line x1="52" y1="32" x2="58" y2="32" stroke="#3DFF9A" stroke-width="1" opacity="0.6"/>
+      </svg>
+      <div class="progress-text">Loading <span>···</span></div>
     </div>
 
-    <!-- Project detail modal (shared, filled by JS on project-tile click) -->
-    <div class="project-modal" id="projectModal" aria-hidden="true">
-      <div class="project-modal-scrim" data-close-project></div>
-      <div class="project-modal-panel">
-        <button type="button" class="project-modal-close" data-close-project aria-label="Close">✕</button>
-        <div class="project-modal-body" id="projectModalBody"></div>
-      </div>
+    <div class="scroll-cue">
+      <span>Scroll</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 5v14M5 12l7 7 7-7"/>
+      </svg>
     </div>
+  </section>
+
+  <!-- COMING SOON -->
+  <section class="coming">
+    <div class="coming-label">Next revision</div>
+    <div class="coming-big">Coming Soon</div>
+    <div class="divider"></div>
+    <p class="coming-sub">
+      We're rebuilding section by section — check back soon to see it come together.
+    </p>
+  </section>
+
+<script>
+(function(){
+  const canvas = document.getElementById('bg-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H;
+
+  function resize(){
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  let mouseX = W/2, mouseY = H/2;
+  let targetX = mouseX, targetY = mouseY;
+  let hoverStrength = 0, targetStrength = 0;
+
+  window.addEventListener('mousemove', e=>{
+    targetX = e.clientX;
+    targetY = e.clientY;
+    targetStrength = 1;
+  });
+  window.addEventListener('mouseleave', ()=>{ targetStrength = 0; });
+  window.addEventListener('touchmove', e=>{
+    if(e.touches[0]){
+      targetX = e.touches[0].clientX;
+      targetY = e.touches[0].clientY;
+      targetStrength = 1;
+    }
+  }, {passive:true});
+
+  const waves = [
+    { color:'#8B2FF5', baseY:0.30, amp:0.10, freq:1.1, speed: 0.06, phase:0.0, alpha:0.55 },
+    { color:'#3DFF9A', baseY:0.48, amp:0.12, freq:0.8, speed:-0.045, phase:1.4, alpha:0.5 },
+    { color:'#C24CFF', baseY:0.62, amp:0.09, freq:1.4, speed: 0.07, phase:3.1, alpha:0.5 },
+    { color:'#F6F7F9', baseY:0.40, amp:0.07, freq:1.0, speed:-0.05, phase:0.7, alpha:0.28 },
+    { color:'#1FBD73', baseY:0.72, amp:0.11, freq:1.25,speed: 0.055,phase:2.2, alpha:0.55 }
+  ];
+
+  let t = 0;
+
+  function draw(){
+    t += 0.012;
+
+    mouseX += (targetX - mouseX) * 0.06;
+    mouseY += (targetY - mouseY) * 0.06;
+    hoverStrength += (targetStrength - hoverStrength) * 0.05;
+
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = '#050505';
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.globalCompositeOperation = 'screen';
+
+    waves.forEach((w, i)=>{
+      w.phase += w.speed * 0.02;
+
+      ctx.beginPath();
+      ctx.moveTo(0, H);
+
+      const step = Math.max(6, W / 160);
+      for(let x = 0; x <= W; x += step){
+        const nx = x / W;
+
+        const dx = x - mouseX;
+        const dy = (w.baseY * H) - mouseY;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+
+        // colors collide + surge near the cursor
+        const collision = hoverStrength * Math.exp(-(dist*dist) / (2*220*220))
+                           * (140 + 60*Math.sin(t*4 + i*1.7));
+
+        const wave = Math.sin(nx * Math.PI * 2 * w.freq + w.phase * 6.283) * w.amp * H;
+
+        const y = w.baseY * H + wave + collision;
+        ctx.lineTo(x, y);
+      }
+
+      ctx.lineTo(W, H);
+      ctx.closePath();
+
+      ctx.globalAlpha = w.alpha + hoverStrength * 0.15;
+      ctx.fillStyle = w.color;
+      ctx.fill();
+    });
+
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
 
-    <!-- =========================
-         HELP SECTION
-    ========================== -->
-    <section id="help" class="content-section">
-      <div class="help-wrapper">
-        <div class="help-grid">
-          <article class="help-card">
-            <h2 class="help-title" data-i18n="help.title">Need Help?</h2>
-            <p class="help-subtitle" data-i18n="help.subtitle">
-              Report bugs, request support, or offer to test new updates for Quagen Studios.
-            </p>
+    requestAnimationFrame(draw);
+  }
 
-            <ul class="help-list">
-              <li data-i18n="help.bullets.0">Issues with games or experiences</li>
-              <li data-i18n="help.bullets.1">Feedback on UI, performance, or features</li>
-              <li data-i18n="help.bullets.2">Requests to become or remain a tester</li>
-              <li data-i18n="help.bullets.3">General questions about Project Q</li>
-            </ul>
-
-            <p class="help-note" data-i18n="help.note">
-              Messages are routed to the studio inbox. Please allow some time for a response.
-            </p>
-          </article>
-
-          <article class="help-card help-card-form">
-            <h3 class="help-form-title" data-i18n="help.form.title">Send a Help Request</h3>
-
-            <form id="helpForm" class="help-form">
-              <div class="help-row">
-                <label for="helpSubject" data-i18n="help.form.subjectLabel">Subject</label>
-                <input type="text"
-                       id="helpSubject"
-                       name="subject"
-                       data-i18n-placeholder="help.form.subjectPlaceholder"
-                       placeholder="Bug report, feedback, tester request..."
-                       required>
-              </div>
-
-              <div class="help-row">
-                <label for="helpMessage" data-i18n="help.form.messageLabel">Message</label>
-                <textarea id="helpMessage"
-                          name="message"
-                          data-i18n-placeholder="help.form.messagePlaceholder"
-                          placeholder="Tell me what’s going on in as much detail as you can."
-                          rows="5"
-                          required></textarea>
-              </div>
-
-              <div class="help-row">
-                <label for="helpContact" data-i18n="help.form.contactLabel">Discord or Email</label>
-                <input type="text"
-                       id="helpContact"
-                       name="contact"
-                       data-i18n-placeholder="help.form.contactPlaceholder"
-                       placeholder="@discordname or user@gmail.com to contact you."
-                       required>
-              </div>
-
-              <button type="submit" class="help-submit-btn" data-i18n="help.form.submit">
-                Send Request
-              </button>
-            </form>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- =========================
-         CHANGELOG SECTION
-    ========================== -->
-    <section id="changelog" class="content-section legal-section">
-      <div class="legal-wrap">
-
-        <header class="legal-top legal-fade">
-          <div class="legal-top-left">
-            <span class="legal-chip" data-i18n="changelog.meta.chip">RESOURCES</span>
-
-            <div class="legal-top-meta">
-              <span class="legal-top-label" data-i18n="changelog.meta.lastUpdatedLabel">Last Updated:</span>
-              <span class="legal-top-date" data-i18n="changelog.meta.lastUpdatedValue">1/1/2026</span>
-            </div>
-          </div>
-
-          <div class="legal-top-title">
-            <h2 class="legal-page-title" data-i18n="changelog.title">Changelog</h2>
-            <p class="legal-page-subtitle" data-i18n="changelog.subtitle">
-              What’s new on quagen.lol — features, navigation, UI, and behavior updates.
-            </p>
-          </div>
-        </header>
-
-        <div class="legal-grid">
-          <article class="legal-panel legal-fade" aria-label="Changelog details">
-           
-
-            <section class="legal-item">
-              <header class="legal-item-head">
-                <h3 class="legal-item-title" data-i18n="changelog.sections.1.title">1. Background & vibe</h3>
-              </header>
-              <p class="legal-item-text" data-i18n="changelog.sections.1.body">
-                A stylized background layer plus a snow overlay, giving the site a seasonal/holiday “animated” feel.
-              </p>
-            </section>
-
-            <div class="legal-divider"></div>
-
-            <section class="legal-item">
-              <header class="legal-item-head">
-                <h3 class="legal-item-title" data-i18n="changelog.sections.2.title">2. Header features</h3>
-              </header>
-              <ul class="legal-bullets">
-                <li data-i18n="changelog.sections.2.bullets.0">Navigation toggle: a folder icon button that opens the sidebar.</li>
-                <li data-i18n="changelog.sections.2.bullets.1">Global audio mute: controls site audio (anthem + card audio behavior).</li>
-              </ul>
-            </section>
-
-            <div class="legal-divider"></div>
-
-            <section class="legal-item">
-              <header class="legal-item-head">
-                <h3 class="legal-item-title" data-i18n="changelog.sections.3.title">3. Sidebar navigation</h3>
-              </header>
-              <p class="legal-item-text" data-i18n="changelog.sections.3.body">
-                The sidebar includes a “Navigation” title and links to core sections.
-              </p>
-              <ul class="legal-bullets">
-                <li data-i18n="changelog.sections.3.bullets.0">About</li>
-                <li data-i18n="changelog.sections.3.bullets.1">Founder</li>
-                <li data-i18n="changelog.sections.3.bullets.2">Teams</li>
-                <li data-i18n="changelog.sections.3.bullets.3">Projects</li>
-                <li data-i18n="changelog.sections.3.bullets.4">Communications</li>
-                <li data-i18n="changelog.sections.3.bullets.5">Help</li>
-              </ul>
-              <p class="legal-item-text" data-i18n="changelog.sections.3.note">
-                Clicking a link switches sections, highlights the active link, and closes the sidebar automatically.
-              </p>
-            </section>
-
-            <div class="legal-divider"></div>
-
-          
-          </article>
-
-          <!-- RIGHT: sidebar (ONLY ONCE) -->
-          <aside class="legal-aside legal-fade" aria-label="Changelog sidebar">
-            <div class="legal-aside-card">
-              <h3 class="legal-aside-title" data-i18n="changelog.aside.quickLinks">Quick Links</h3>
-
-              <a class="legal-aside-link" href="#privacy" data-section-link="privacy" data-i18n="changelog.aside.privacy">
-                Privacy Policy
-              </a>
-              <a class="legal-aside-link" href="#help" data-section-link="help" data-i18n="changelog.aside.support">
-                Support
-              </a>
-              <a class="legal-aside-link" href="#tos" data-section-link="tos" data-i18n="changelog.aside.tos">
-                Terms of Service
-              </a>
-
-              <div class="legal-aside-divider"></div>
-
-              <h3 class="legal-aside-title" data-i18n="changelog.aside.contactTitle">Contact</h3>
-
-              <a class="legal-aside-pill"
-                 href="#"
-                 data-mailto-type="support"
-                 data-i18n="changelog.aside.contactEmail">
-                Email: quagenstudios@gmail.com
-              </a>
-
-              <p class="legal-aside-note" data-i18n="changelog.aside.note">
-                Include details (date, section, device/browser) so we can help faster.
-              </p>
-            </div>
-          </aside>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- =========================
-         TERMS OF SERVICE
-    ========================== -->
-    <section id="tos" class="content-section legal-section">
-  <div class="legal-wrap legal-fade">
-
-    <!-- Top header card (matches changelog) -->
-    <div class="legal-top">
-      <div class="legal-top-left">
-        <span class="legal-chip">Legal</span>
-        <div class="legal-top-meta">
-          <span class="legal-top-label">Last updated:</span>
-          <span class="legal-top-date">12/12/2025</span>
-        </div>
-      </div>
-
-      <h2 class="legal-page-title">Terms of Service</h2>
-      <p class="legal-page-subtitle">
-        Terms governing use of quagen.lol and Quagen Studios / Project Q projects, Roblox games, and assets.
-      </p>
-    </div>
-
-    <div class="legal-grid">
-      <!-- Main content -->
-      <article class="legal-panel legal-card">
-        <div class="legal-item">
-          <h3 class="legal-item-title">1. Acceptance of Terms</h3>
-          <p class="legal-item-text">
-            By accessing or using quagen.lol (the “Website”) or any games, assets, or services by Quagen Studios / Project Q (“we,” “us,” “our”),
-            you agree to these Terms. If you do not agree, do not use the Website or our services.
-          </p>
-        </div>
-
-        <div class="legal-divider"></div>
-
-        <div class="legal-item">
-          <h3 class="legal-item-title">2. What We Provide</h3>
-          <ul class="legal-bullets">
-            <li>Portfolio-style information about Project Q and releases</li>
-            <li>Changelogs, previews, and project updates</li>
-            <li>teams/founder profiles and community links (Discord/Roblox/etc.)</li>
-            <li>Support and collaboration contact options</li>
-          </ul>
-        </div>
-
-        <div class="legal-divider"></div>
-
-        <div class="legal-item">
-          <h3 class="legal-item-title">3. Eligibility</h3>
-          <p class="legal-item-text">
-            You must be at least 13 years old to use the Website or interactive features. If you are under 13, do not submit personal information.
-          </p>
-        </div>
-
-        <div class="legal-divider"></div>
-
-        <div class="legal-item">
-          <h3 class="legal-item-title">4. User Conduct</h3>
-          <ul class="legal-bullets">
-            <li>Do not harass, abuse, or threaten others</li>
-            <li>Do not exploit, reverse engineer, or disrupt the Website or games</li>
-            <li>Do not submit malicious or misleading support requests</li>
-            <li>Do not use automated scraping or bypass security protections</li>
-          </ul>
-        </div>
-
-        <div class="legal-divider"></div>
-
-        <div class="legal-item">
-          <h3 class="legal-item-title">5. Roblox Games & Assets</h3>
-          <p class="legal-item-text">
-            All Quagen Studios / Project Q games, systems, scripts, models, UI, and assets are protected content unless explicitly stated otherwise.
-          </p>
-          <ul class="legal-bullets">
-            <li>No copying, reselling, redistributing, or re-uploading our assets without permission</li>
-            <li>No claiming ownership of Quagen Studios content</li>
-            <li>No exploiting in-game systems or abusing services</li>
-          </ul>
-          <p class="legal-item-text legal-muted">
-            Roblox experiences are also governed by Roblox’s Terms of Use.
-          </p>
-        </div>
-
-        <div class="legal-divider"></div>
-
-        <div class="legal-item">
-          <h3 class="legal-item-title">6. Support Requests & Submissions</h3>
-          <p class="legal-item-text">
-            If you submit support requests or feedback, you agree the info is accurate and you won’t include sensitive personal data.
-            We may retain submissions for support history, moderation, and security.
-          </p>
-        </div>
-
-        <div class="legal-divider"></div>
-
-        <div class="legal-item">
-          <h3 class="legal-item-title">7. Website Hosting, Security & Analytics</h3>
-          <p class="legal-item-text">
-            quagen.lol is hosted on <strong>GitHub Pages</strong> and uses <strong>Cloudflare</strong> for performance, security,
-            and analytics/insights. These services may process limited technical data (such as IP address, request logs, and device/browser info)
-            to deliver the Website, prevent abuse, and understand site performance.
-          </p>
-        </div>
-
-        <div class="legal-divider"></div>
-
-        <div class="legal-item">
-          <h3 class="legal-item-title">8. Third-Party Services</h3>
-          <p class="legal-item-text">
-            The Website may link to third-party platforms (Discord, Roblox, GitHub, etc.). We are not responsible for their content or policies.
-          </p>
-        </div>
-
-        <div class="legal-divider"></div>
-
-        <div class="legal-item">
-          <h3 class="legal-item-title">9. Availability & Changes</h3>
-          <p class="legal-item-text">
-            We may update, suspend, or discontinue the Website or services at any time. Continued use after updates means you accept the new Terms.
-          </p>
-        </div>
-
-        <div class="legal-divider"></div>
-
-        <div class="legal-item">
-          <h3 class="legal-item-title">10. Disclaimer & Liability</h3>
-          <p class="legal-item-text">
-            The Website and content are provided “as is” and “as available.” To the maximum extent permitted by law, we are not liable for indirect
-            damages, lost data, outages, or issues caused by third-party platforms or services.
-          </p>
-        </div>
-      </article>
-
-      <!-- Right side (matches changelog quick links card) -->
-      <aside class="legal-aside">
-        <div class="legal-aside-card">
-          <h3 class="legal-aside-title">Quick Links</h3>
-          <a class="legal-aside-link" href="#privacy">Privacy Policy</a>
-          <a class="legal-aside-link" href="#help">Support</a>
-
-          <div class="legal-aside-divider"></div>
-
-          <h3 class="legal-aside-title">Contact</h3>
-          <a class="legal-aside-pill" href="mailto:quagenstudios@gmail.com?subject=Terms%20Question%20-%20quagen.lol">
-            Email: quagenstudios@gmail.com
-          </a>
-
-          <p class="legal-aside-note">
-            Include details (date, section, device/browser) so we can help faster.
-          </p>
-        </div>
-      </aside>
-    </div>
-  </div>
-</section>
-
-
-
-    <!-- =========================
-         PRIVACY
-    ========================== -->
-    <section id="privacy" class="content-section legal-section">
-  <div class="legal-wrap legal-fade">
-
-    <!-- Top header card -->
-    <div class="legal-top">
-      <div class="legal-top-left">
-        <span class="legal-chip">Legal</span>
-        <div class="legal-top-meta">
-          <span class="legal-top-label">Last updated:</span>
-          <span class="legal-top-date">12/12/2025</span>
-        </div>
-      </div>
-
-      <h2 class="legal-page-title">Privacy Policy</h2>
-      <p class="legal-page-subtitle">
-        How quagen.lol and Quagen Studios / Project Q collect, use, and protect information.
-      </p>
-    </div>
-
-    <div class="legal-grid">
-      <!-- Main content -->
-      <article class="legal-panel legal-card">
-
-        <div class="legal-item">
-          <h3 class="legal-item-title">1. Overview</h3>
-          <p class="legal-item-text">
-            This Privacy Policy explains how quagen.lol (“we,” “us,” “our”) collects, uses, and protects information when
-            you visit our website or interact with its features. The Website serves as a portfolio and information hub
-            for Quagen Studios / Project Q, including projects, teams information, updates, and support contact options.
-          </p>
-          <p class="legal-item-text">
-            By using this Website, you agree to the practices described in this Privacy Policy.
-          </p>
-        </div>
-
-        <div class="legal-divider"></div>
-
-        <div class="legal-item">
-          <h3 class="legal-item-title">2. What This Website Does</h3>
-          <ul class="legal-bullets">
-            <li>Displays project and release information (including changelogs)</li>
-            <li>Shows teams and founder profiles</li>
-            <li>Links to community platforms (Discord, Roblox, GitHub, etc.)</li>
-            <li>Provides contact and support options</li>
-          </ul>
-        </div>
-
-        <div class="legal-divider"></div>
-
-        <div class="legal-item">
-          <h3 class="legal-item-title">3. Information You Provide</h3>
-          <p class="legal-item-text">
-            You may choose to provide information when you:
-          </p>
-          <ul class="legal-bullets">
-            <li>Submit a support or help request</li>
-            <li>Contact us via provided email links</li>
-          </ul>
-          <p class="legal-item-text">
-            This information may include a username, email address, or message content. We use it only to respond to your request.
-          </p>
-        </div>
-
-        <div class="legal-divider"></div>
-
-        <div class="legal-item">
-          <h3 class="legal-item-title">4. Information Collected Automatically</h3>
-          <p class="legal-item-text">
-            When you visit quagen.lol, limited technical information may be collected automatically for basic operation,
-            security, and analytics purposes:
-          </p>
-          <ul class="legal-bullets">
-            <li>IP address (typically logged by hosting/security providers)</li>
-            <li>Browser and device type</li>
-            <li>Pages viewed and navigation behavior</li>
-            <li>Approximate location derived from IP (not precise GPS)</li>
-            <li>Referrer URL and visit timestamps</li>
-            <li>Performance and error data</li>
-          </ul>
-          <p class="legal-item-text legal-muted">
-            We do not intentionally collect sensitive personal data such as government IDs, payment information, or precise location data.
-          </p>
-        </div>
-
-        <div class="legal-divider"></div>
-
-        <div class="legal-item">
-          <h3 class="legal-item-title">5. Hosting, Security & Analytics</h3>
-          <p class="legal-item-text">
-            quagen.lol is hosted using <strong>GitHub Pages</strong> and uses <strong>Cloudflare</strong> for performance,
-            security, and analytics. These services may process limited technical data such as IP address, request logs,
-            and device/browser information to:
-          </p>
-          <ul class="legal-bullets">
-            <li>Deliver and secure the Website</li>
-            <li>Prevent abuse, spam, and malicious traffic</li>
-            <li>Analyze site performance and usage trends</li>
-          </ul>
-          <p class="legal-item-text">
-            We aim to collect the minimum data necessary and avoid collecting personally identifying information unless required for security or support.
-          </p>
-        </div>
-
-        <div class="legal-divider"></div>
-
-        <div class="legal-item">
-          <h3 class="legal-item-title">6. Cookies & Local Storage</h3>
-          <p class="legal-item-text">
-            We may use cookies or browser storage to:
-          </p>
-          <ul class="legal-bullets">
-            <li>Save user preferences (such as language selection)</li>
-            <li>Improve performance and user experience</li>
-            <li>Assist with security and abuse prevention</li>
-          </ul>
-          <p class="legal-item-text">
-            You can control cookies through your browser settings. Disabling them may affect certain features.
-          </p>
-        </div>
-
-        <div class="legal-divider"></div>
-
-        <div class="legal-item">
-          <h3 class="legal-item-title">7. How We Share Information</h3>
-          <p class="legal-item-text"><strong>We do not sell your personal information.</strong></p>
-          <p class="legal-item-text">
-            Information may be shared only in limited circumstances:
-          </p>
-          <ul class="legal-bullets">
-            <li>With service providers (hosting, security, analytics)</li>
-            <li>For legal or safety reasons if required by law</li>
-            <li>As part of a project or site transition or restructuring</li>
-          </ul>
-        </div>
-
-        <div class="legal-divider"></div>
-
-        <div class="legal-item">
-          <h3 class="legal-item-title">8. Third-Party Links</h3>
-          <p class="legal-item-text">
-            quagen.lol may link to third-party platforms such as Discord, Roblox, GitHub, or social media sites.
-            We are not responsible for the privacy practices of those websites.
-          </p>
-        </div>
-
-        <div class="legal-divider"></div>
-
-        <div class="legal-item">
-          <h3 class="legal-item-title">9. Data Retention</h3>
-          <p class="legal-item-text">
-            We retain information only as long as needed to respond to support requests, maintain security logs,
-            and improve the Website. Support messages may be kept to track history and prevent abuse.
-          </p>
-        </div>
-
-        <div class="legal-divider"></div>
-
-        <div class="legal-item">
-          <h3 class="legal-item-title">10. Children’s Privacy</h3>
-          <p class="legal-item-text">
-            This Website is not intended for children under 13. We do not knowingly collect personal information from children under 13.
-            If you believe such information was submitted, contact us and we will remove it.
-          </p>
-        </div>
-
-        <div class="legal-divider"></div>
-
-        <div class="legal-item">
-          <h3 class="legal-item-title">11. Your Choices</h3>
-          <p class="legal-item-text">
-            Depending on your location, you may have rights to request access, correction, or deletion of information you provided.
-            To request deletion, contact us with enough detail to locate the message.
-          </p>
-        </div>
-
-      </article>
-
-      <!-- Right side -->
-      <aside class="legal-aside">
-        <div class="legal-aside-card">
-          <h3 class="legal-aside-title">Quick Links</h3>
-          <a class="legal-aside-link" href="#tos">Terms of Service</a>
-          <a class="legal-aside-link" href="#help">Support</a>
-
-          <div class="legal-aside-divider"></div>
-
-          <h3 class="legal-aside-title">Contact</h3>
-          <a class="legal-aside-pill" href="mailto:quagenstudios@gmail.com?subject=Privacy%20Question%20-%20quagen.lol">
-            Email: quagenstudios@gmail.com
-          </a>
-
-          <p class="legal-aside-note">
-            Include details (date, section, device/browser) so we can help faster.
-          </p>
-        </div>
-      </aside>
-    </div>
-  </div>
-</section>
-
-<!-- =========================
-         STATUS SECTION
-    ========================== -->
-
-<section id="status" class="content-section">
-  <div class="status-wrap">
-
-    <header class="status-hero">
-      <h2 class="status-title">quagen.lol Service Status</h2>
-      <p class="status-subtitle">
-        Real-time style updates for availability and performance of Project Q services.
-      </p>
-    </header>
-
-    <!-- Animated warning banner (only show when degraded/outage) -->
-    <div class="status-banner status-banner-warn" id="statusBanner" hidden>
-      <span class="status-banner-dot" aria-hidden="true"></span>
-      <div class="status-banner-text">
-        <strong>Systems Services Outages/Degraded</strong>
-        <span>Some systems may be slower than normal.</span>
-      </div>
-    </div>
-
-    <!-- Big overall pill -->
-    <div class="status-summary" id="statusSummary">
-      <span class="status-dot status-red status-pulse" id="summaryDot"></span>
-      <span class="status-summary-text" id="summaryText">Some Systems Operational</span>
-    </div>
-
-    <div class="status-grid">
-      <!-- LEFT: main cards -->
-      <div class="status-col">
-        <article class="status-card">
-          <div class="status-card-head">
-            <h3 class="status-card-title">quagen.lol</h3>
-            <span class="status-pill status-pill-yellow status-pulse" id="sitePill">Systems Degraded</span>
-          </div>
-
-          <div class="status-rows">
-            <!-- Row template (tooltip + pulse on degraded) -->
-            <div class="status-row" data-tip="Main website availability & routing.">
-              <div class="status-row-left">
-                <span class="status-ico">🌐</span>
-                <span class="status-name">Website</span>
-              </div>
-              <div class="status-row-right">
-                <span class="status-state">Degraded</span>
-                <span class="status-dot status-yellow status-pulse" aria-hidden="true"></span>
-              </div>
-            </div>
-
-            <div class="status-row" data-tip="Cloudflare protection, caching, and edge performance.">
-              <div class="status-row-left">
-                <span class="status-ico">🛡️</span>
-                <span class="status-name">Security / Edge</span>
-              </div>
-              <div class="status-row-right">
-                <span class="status-state">Fast</span>
-                <span class="status-dot status-green status-pulse" aria-hidden="true"></span>
-              </div>
-            </div>
-
-            <div class="status-row" data-tip="GitHub Pages hosting & builds.">
-              <div class="status-row-left">
-                <span class="status-ico">📦</span>
-                <span class="status-name">Static Hosting</span>
-              </div>
-              <div class="status-row-right">
-                <span class="status-state">Fast</span>
-                <span class="status-dot status-green status-pulse" aria-hidden="true"></span>
-              </div>
-            </div>
-
-            <!-- example degraded row (pulse) -->
-            <div class="status-row is-degraded" data-tip="Traffic analytics may be delayed.">
-              <div class="status-row-left">
-                <span class="status-ico">📊</span>
-                <span class="status-name">Analytics</span>
-              </div>
-              <div class="status-row-right">
-                <span class="status-state">Degraded</span>
-                <span class="status-dot status-yellow status-pulse" aria-hidden="true"></span>
-              </div>
-            </div>
-          </div>
-        </article>
-        
-
-        <article class="status-card">
-          <div class="status-card-head">
-            <h3 class="status-card-title">Integrations</h3>
-            <span class="status-pill status-pill-red status-pulse">System Outage</span>
-          </div>
-
-          <div class="status-rows">
-            <div class="status-row" data-tip="Discord links, presence, and related endpoints.">
-              <div class="status-row-left">
-                <span class="status-ico">💬</span>
-                <span class="status-name">Discord</span>
-              </div>
-              <div class="status-row-right">
-                <span class="status-state">Outage</span>
-                <span class="status-dot status-red status-pulse" aria-hidden="true"></span>
-              </div>
-            </div>
-
-            <div class="status-row" data-tip="Language Selection Automatic Change.">
-              <div class="status-row-left">
-                <span class="status-ico">💬</span>
-                <span class="status-name">Language Selection</span>
-              </div>
-              <div class="status-row-right">
-                <span class="status-state">Outage</span>
-                <span class="status-dot status-red status-pulse" aria-hidden="true"></span>
-              </div>
-            </div>
-          </div>
-        </article>
-      </div>
-
-      <!-- RIGHT: quick links -->
-      <aside class="status-side">
-        <article class="status-card">
-          <div class="status-card-head">
-            <h3 class="status-card-title">Quick Links</h3>
-          </div>
-
-          <a class="status-link" href="#privacy">Privacy Policy</a>
-          <a class="status-link" href="#help">Support</a>
-          <a class="status-link" href="#tos">Terms of Service</a>
-        </article>
-      </aside>
-    </div>
-
-  </div>
-</section>
-
-  </main>
-
-  <!-- Toast container (for notifications) -->
-  <div id="toastContainer" class="toast-container"></div>
-
-  <!-- FOOTER -->
-  <footer class="site-footer">
-    <div class="footer-inner">
-
-      <div class="footer-brand footer-glow-card">
-      <div class="brand-header">
-        <div class="brand-left">
-          <span class="brand-logo" aria-hidden="true">🍟</span>
-          <span class="brand-name">quagen.lol</span>
-        </div>
-
-        <!-- Button sits to the RIGHT of quagen.lol -->
-        <button class="system-status-btn" data-open-status type="button" aria-label="Open System Status">
-          <span class="status-dot status-red" id="sysBtnDot" aria-hidden="true"></span>
-          <span class="sys-btn-text">System Status</span>
-
-          <!-- tooltip text changes -->
-          <span class="sys-tooltip" id="sysTooltip" role="tooltip">
-            Some Systems Are Operational
-          </span>
-        </button>
-      </div>
-
-      <p class="brand-description" data-i18n="footer.brand.desc">
-        Building creative, modern experiences under Project Q.
-      </p>
-
-    <!-- =========================
-         LANGUAGE SECTION
-    ========================== -->
-
-        <div class="lang" id="langPicker">
-           <button class="language-select"
-                  id="langBtn"
-                  type="button"
-                  aria-haspopup="listbox"
-                  aria-expanded="false">
-            <img id="langFlag" src="https://flagcdn.com/us.svg" alt="US">
-            <span id="langLabel">English (US)</span>
-            <span class="chevron" id="langChevron">▾</span>
-          </button>
-
-          <div class="lang-menu" id="langMenu" role="listbox" tabindex="-1" hidden>
-            <button class="lang-option is-selected" type="button" role="option"
-                    data-lang="en-US" data-flag="us" data-label="English (US)"
-                    data-i18n="footer.lang.en">
-              English (US)
-            </button>
-
-            <button class="lang-option" type="button" role="option"
-                    data-lang="es-ES" data-flag="es" data-label="Español (ES)"
-                    data-i18n="footer.lang.es">
-              Español (ES)
-            </button>
-
-            <button class="lang-option" type="button" role="option"
-                    data-lang="fr-FR" data-flag="fr" data-label="Français (FR)"
-                    data-i18n="footer.lang.fr">
-              Français (FR)
-            </button>
-
-            <button class="lang-option" type="button" role="option"
-                    data-lang="de-DE" data-flag="de" data-label="Deutsch (DE)"
-                    data-i18n="footer.lang.de">
-              Deutsch (DE)
-            </button>
-
-            <button class="lang-option" type="button" role="option"
-                    data-lang="pt-PT" data-flag="pt" data-label="Português (PT)"
-                    data-i18n="footer.lang.pt">
-              Português (PT)
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div class="footer-links">
-        <div class="footer-col">
-          <h4 data-i18n="footer.cols.general">General</h4>
-          <a href="#help" data-i18n="footer.links.requestProfile">Profile Card Inquiry</a>
-        </div>
-
-        <div class="footer-col">
-          <h4 data-i18n="footer.cols.resources">Resources</h4>
-          <a href="#help" data-i18n="footer.links.support">Support</a>
-          <a href="#changelog" data-i18n="footer.links.changelog">Changelog</a>
-        </div>
-
-        <div class="footer-col">
-          <h4 data-i18n="footer.cols.contact">Contact</h4>
-          <a href="https://discord.gg/rMpkKrbtWY" data-i18n="footer.links.discord">Discord Server</a>
-          <a href="mailto:quagenstudios@gmail.com?subject=Support%20Question%20-%20quagen.lol" data-email="support" data-i18n="footer.links.supportEmail">Support Email</a>
-          <a href="mailto:quagenstudios@gmail.com?subject=Business%20Question%20-%20quagen.lol" data-email="business" data-i18n="footer.links.businessEmail">Business Email</a>
-          <a href="mailto:quagenstudios@gmail.com?subject=Legal%20Question%20-%20quagen.lol" data-email="legal" data-i18n="footer.links.legalEmail">Legal Email</a>
-        </div>
-
-        <div class="footer-col">
-          <h4 data-i18n="footer.cols.legal">Legal</h4>
-          <a href="#tos" data-i18n="footer.links.tos">Terms of Service</a>
-          <a href="#privacy" data-i18n="footer.links.privacy">Privacy Policy</a>
-        </div>
-      </div>
-
-    </div>
-
-    <div class="footer-bottom">
-      <span data-i18n="footer.bottom.copyright">© QUAGEN.LOL 2026 — All Rights Reserved.</span>
-
-      <div class="footer-socials">
-        <a class="footer-social"
-           href="https://discord.gg/rMpkKrbtWY"
-           target="_blank"
-           rel="noopener noreferrer"
-           aria-label="Discord">
-          <img src="assets/socials/discord.svg" alt="Discord">
-        </a>
-      </div>
-    </div>
-  </footer>
-  <audio id="anthemAudio" src="assets/songs/Profile-Songs/anthem.mp3" loop preload="auto"></audio>
+  draw();
+})();
+</script>
 </body>
 </html>
