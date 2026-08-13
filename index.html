@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>quagen.lol | Coming Soon</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            background: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .coming-soon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        h1 {
+            font-size: 64px;
+            font-weight: 700;
+            margin-bottom: 25px;
+        }
+
+        .countdown {
+            display: flex;
+            gap: 30px;
+        }
+
+        .time-box {
+            min-width: 100px;
+        }
+
+        .number {
+            display: block;
+            font-size: 42px;
+            font-weight: 700;
+        }
+
+        .label {
+            display: block;
+            font-size: 14px;
+            color: #999;
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* ==============================
+           AUDIO PLAYER
+           ============================== */
+
+        .audio-player {
+            position: fixed;
+            top: 28px;
+            left: 32px;
+            width: 490px;
+            height: 82px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 12px 18px;
+            background: rgba(25, 25, 25, 0.94);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 45px;
+            box-shadow:
+                0 10px 35px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            z-index: 9999;
+        }
+
+        .audio-toggle {
+            width: 56px;
+            height: 56px;
+            flex-shrink: 0;
+            border: 0;
+            border-radius: 50%;
+            background: #3185a3;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .audio-toggle:hover {
+            transform: scale(1.05);
+            background: #3b9abd;
+        }
+
+        .audio-toggle:active {
+            transform: scale(0.95);
+        }
+
+        .audio-toggle svg {
+            width: 25px;
+            height: 25px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .audio-controls {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .volume-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        #volumeSlider {
+            width: 150px;
+            height: 5px;
+            appearance: none;
+            -webkit-appearance: none;
+            background: #444;
+            border-radius: 10px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        #volumeSlider::-webkit-slider-thumb {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 0;
+            border-radius: 50%;
+            background: #54b5d8;
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(84, 181, 216, 0.4);
+        }
+
+        #volumeSlider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border: 0;
+            border-radius: 50%;
+            background: #54b5d8;
+            cursor: pointer;
+        }
+
+        #volumePercent {
+            color: #aaa;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .now-playing {
+            margin-top: 7px;
+            font-size: 14px;
+            color: #777;
+            text-align: left;
+        }
+
+        .now-playing strong {
+            color: #55b9df;
+            margin-left: 4px;
+            font-weight: 500;
+        }
+
+        /* Autoplay notice */
+        .audio-status {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #666;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 9998;
+        }
+
+        .audio-status.show {
+            opacity: 1;
+        }
+
+        @media (max-width: 600px) {
+            .audio-player {
+                top: 18px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: calc(100% - 30px);
+                max-width: 490px;
+            }
+
+            h1 {
+                font-size: 42px;
+            }
+
+            .countdown {
+                gap: 12px;
+            }
+
+            .time-box {
+                min-width: 70px;
+            }
+
+            .number {
+                font-size: 28px;
+            }
+
+            .label {
+                font-size: 10px;
+            }
+
+            #volumeSlider {
+                width: 110px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Background Music -->
+    <audio id="backgroundMusic" loop preload="auto">
+        <source src="assets/songs/background.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Audio Player -->
+    <div class="audio-player" id="audioPlayer">
+
+        <button class="audio-toggle" id="audioToggle" aria-label="Mute audio">
+            <svg id="volumeIcon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M11 5 6 9H3v6h3l5 4V5Z"></path>
+                <path d="M15.5 8.5a5 5 0 0 1 0 7"></path>
+                <path d="M18.5 5.5a9 9 0 0 1 0 13"></path>
+            </svg>
+        </button>
+
+        <div class="audio-controls">
+            <div class="volume-row">
+                <input
+                    type="range"
+                    id="volumeSlider"
+                    min="0"
+                    max="100"
+                    value="100"
+                    aria-label="Volume"
+                >
+                <span id="volumePercent">100%</span>
+            </div>
+
+            <div class="now-playing">
+                <span>Now Playing:</span>
+                <strong id="songName">Background Music</strong>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="audio-status" id="audioStatus">
+        Click anywhere to start audio
+    </div>
+
+    <!-- Coming Soon -->
+    <main class="coming-soon">
+        <h1>Coming Soon</h1>
+
+        <div class="countdown">
+            <div class="time-box">
+                <span class="number" id="days">00</span>
+                <span class="label">Days</span>
+            </div>
+
+            <div class="time-box">
+                <span class="number" id="hours">00</span>
+                <span class="label">Hours</span>
+            </div>
+
+            <div class="time-box">
+                <span class="number" id="minutes">00</span>
+                <span class="label">Minutes</span>
+            </div>
+
+            <div class="time-box">
+                <span class="number" id="seconds">00</span>
+                <span class="label">Seconds</span>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        /* ==========================================
+           COUNTDOWN
+           ========================================== */
+
+        const launchDate = new Date(
+            "August 20, 2026 12:00:00"
+        ).getTime();
+
+        function updateCountdown() {
+            const now = Date.now();
+            const distance = launchDate - now;
+
+            if (distance <= 0) {
+                document.getElementById("days").textContent = "00";
+                document.getElementById("hours").textContent = "00";
+                document.getElementById("minutes").textContent = "00";
+                document.getElementById("seconds").textContent = "00";
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor(
+                (distance % (1000 * 60 * 60 * 24)) /
+                (1000 * 60 * 60)
+            );
+            const minutes = Math.floor(
+                (distance % (1000 * 60 * 60)) /
+                (1000 * 60)
+            );
+            const seconds = Math.floor(
+                (distance % (1000 * 60)) /
+                1000
+            );
+
+            document.getElementById("days").textContent =
+                String(days).padStart(2, "0");
+
+            document.getElementById("hours").textContent =
+                String(hours).padStart(2, "0");
+
+            document.getElementById("minutes").textContent =
+                String(minutes).padStart(2, "0");
+
+            document.getElementById("seconds").textContent =
+                String(seconds).padStart(2, "0");
+        }
+
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+
+
+        /* ==========================================
+           BACKGROUND AUDIO
+           ========================================== */
+
+        const music = document.getElementById("backgroundMusic");
+        const audioToggle = document.getElementById("audioToggle");
+        const volumeSlider = document.getElementById("volumeSlider");
+        const volumePercent = document.getElementById("volumePercent");
+        const volumeIcon = document.getElementById("volumeIcon");
+        const audioStatus = document.getElementById("audioStatus");
+
+        let isMuted = false;
+
+        music.volume = 1;
+
+        function setVolumeIcon() {
+            if (music.muted || music.volume === 0) {
+                volumeIcon.innerHTML = `
+                    <path d="M11 5 6 9H3v6h3l5 4V5Z"></path>
+                    <path d="m18 9-6 6"></path>
+                    <path d="m12 9 6 6"></path>
+                `;
+            } else if (music.volume < 0.5) {
+                volumeIcon.innerHTML = `
+                    <path d="M11 5 6 9H3v6h3l5 4V5Z"></path>
+                    <path d="M15.5 8.5a5 5 0 0 1 0 7"></path>
+                `;
+            } else {
+                volumeIcon.innerHTML = `
+                    <path d="M11 5 6 9H3v6h3l5 4V5Z"></path>
+                    <path d="M15.5 8.5a5 5 0 0 1 0 7"></path>
+                    <path d="M18.5 5.5a9 9 0 0 1 0 13"></path>
+                `;
+            }
+        }
+
+        async function startMusic() {
+            try {
+                await music.play();
+                audioStatus.classList.remove("show");
+                setVolumeIcon();
+                return true;
+            } catch (error) {
+                audioStatus.classList.add("show");
+                return false;
+            }
+        }
+
+        // Try to start immediately when the page loads.
+        window.addEventListener("load", () => {
+            startMusic();
+        });
+
+        // Browsers that block autoplay will start the audio
+        // on the visitor's first interaction.
+        function firstInteraction() {
+            if (music.paused) {
+                startMusic();
+            }
+
+            document.removeEventListener("pointerdown", firstInteraction);
+            document.removeEventListener("keydown", firstInteraction);
+        }
+
+        document.addEventListener("pointerdown", firstInteraction, { once: true });
+        document.addEventListener("keydown", firstInteraction, { once: true });
+
+
+        /* ==========================================
+           MUTE / UNMUTE
+           ========================================== */
+
+        audioToggle.addEventListener("click", (event) => {
+            event.stopPropagation();
+
+            if (music.muted) {
+                music.muted = false;
+                isMuted = false;
+            } else {
+                music.muted = true;
+                isMuted = true;
+            }
+
+            setVolumeIcon();
+        });
+
+
+        /* ==========================================
+           VOLUME
+           ========================================== */
+
+        volumeSlider.addEventListener("input", () => {
+            const volume = Number(volumeSlider.value) / 100;
+
+            music.volume = volume;
+            music.muted = false;
+            isMuted = volume === 0;
+
+            volumePercent.textContent = `${volumeSlider.value}%`;
+
+            setVolumeIcon();
+        });
+
+
+        /* ==========================================
+           AUDIO EVENTS
+           ========================================== */
+
+        music.addEventListener("play", () => {
+            audioStatus.classList.remove("show");
+            setVolumeIcon();
+        });
+
+        music.addEventListener("pause", () => {
+            setVolumeIcon();
+        });
+    </script>
+
+</body>
+</html>
