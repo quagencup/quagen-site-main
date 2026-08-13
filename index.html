@@ -86,6 +86,10 @@
 </head>
 
 <body>
+     <!-- Background Music -->
+    <audio id="background-music" loop>
+        <source src="assets/songs/Hurricane Wisdom - Running Live.mp3" type="audio/mpeg">
+    </audio>
 
     <div class="coming-soon">
         <h1>Coming Soon</h1>
@@ -158,6 +162,28 @@
 
         updateCountdown();
         setInterval(updateCountdown, 1000);
+        // ==========================================
+        // BACKGROUND MUSIC
+        // ==========================================
+
+        const music = document.getElementById("background-music");
+        const startScreen = document.getElementById("start-screen");
+        const mainContent = document.getElementById("main-content");
+        const enterButton = document.getElementById("enter-button");
+
+        enterButton.addEventListener("click", async () => {
+
+            try {
+                await music.play();
+
+                startScreen.style.display = "none";
+                mainContent.style.display = "block";
+
+            } catch (error) {
+                console.error("Audio failed to play:", error);
+            }
+
+        });
     </script>
 
 </body>
