@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Under Development — Website Overhaul</title>
+<title>quagen.lol | Coming Soon</title>
 <style>
   :root{
     --black:#050505;
@@ -193,168 +193,30 @@
   }
 </style>
 </head>
-<body>
+<div class="coming-soon">
+    <h1>Coming Soon</h1>
 
-  <canvas id="bg-canvas"></canvas>
+    <div class="countdown">
+        <div class="countdown-item">
+            <span id="days">00</span>
+            <small>Days</small>
+        </div>
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="eyebrow">Something new is forming</div>
-    <h1 class="headline">Under Development</h1>
-    <p class="subtitle">
-      Website Overhaul
-      <span class="label">Rebuilding, piece by piece</span>
-    </p>
+        <div class="countdown-item">
+            <span id="hours">00</span>
+            <small>Hours</small>
+        </div>
 
-    <div class="loader-wrap">
-      <svg class="compass" viewBox="0 0 64 64" fill="none">
-        <circle cx="32" cy="32" r="28" stroke="#3DFF9A" stroke-width="1.5" opacity="0.5"/>
-        <circle cx="32" cy="32" r="2" fill="#C24CFF"/>
-        <g class="needle">
-          <line x1="32" y1="32" x2="32" y2="8" stroke="#C24CFF" stroke-width="2" stroke-linecap="round"/>
-          <line x1="32" y1="32" x2="32" y2="52" stroke="#3DFF9A" stroke-width="2" stroke-linecap="round"/>
-        </g>
-        <line x1="32" y1="6" x2="32" y2="12" stroke="#3DFF9A" stroke-width="1" opacity="0.6"/>
-        <line x1="32" y1="52" x2="32" y2="58" stroke="#3DFF9A" stroke-width="1" opacity="0.6"/>
-        <line x1="6" y1="32" x2="12" y2="32" stroke="#3DFF9A" stroke-width="1" opacity="0.6"/>
-        <line x1="52" y1="32" x2="58" y2="32" stroke="#3DFF9A" stroke-width="1" opacity="0.6"/>
-      </svg>
-      <div class="progress-text">Loading <span>···</span></div>
+        <div class="countdown-item">
+            <span id="minutes">00</span>
+            <small>Minutes</small>
+        </div>
+
+        <div class="countdown-item">
+            <span id="seconds">00</span>
+            <small>Seconds</small>
+        </div>
     </div>
-
-    <div class="scroll-cue">
-      <span>Scroll</span>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M12 5v14M5 12l7 7 7-7"/>
-      </svg>
-    </div>
-  </section>
-
-  <!-- COMING SOON -->
-  <section class="coming">
-    <div class="coming-label">Next revision</div>
-    <div class="coming-big">Coming Soon</div>
-    <div class="divider"></div>
-    <p class="coming-sub">
-      We're rebuilding section by section — check back soon to see it come together.
-    </p>
-  </section>
-
-<script>
-(function(){
-  const canvas = document.getElementById('bg-canvas');
-  const ctx = canvas.getContext('2d');
-
-  // low-res buffer we compute the flow field on, then upscale (blurred) for performance
-  const buffer = document.createElement('canvas');
-  const bctx = buffer.getContext('2d');
-  const SCALE = 0.12;
-
-  let W, H, bw, bh, imgData, data;
-
-  function resize(){
-    W = canvas.width = window.innerWidth;
-    H = canvas.height = window.innerHeight;
-    bw = buffer.width = Math.max(2, Math.floor(W * SCALE));
-    bh = buffer.height = Math.max(2, Math.floor(H * SCALE));
-    imgData = bctx.createImageData(bw, bh);
-    data = imgData.data;
-    ctx.imageSmoothingEnabled = true;
-  }
-  window.addEventListener('resize', resize);
-  resize();
-
-  let mouseX = W/2, mouseY = H/2;
-  let targetX = mouseX, targetY = mouseY;
-  let hover = 0, targetHover = 0;
-
-  window.addEventListener('mousemove', e=>{
-    targetX = e.clientX;
-    targetY = e.clientY;
-    targetHover = 1;
-  });
-  window.addEventListener('mouseleave', ()=>{ targetHover = 0; });
-  window.addEventListener('touchmove', e=>{
-    if(e.touches[0]){
-      targetX = e.touches[0].clientX;
-      targetY = e.touches[0].clientY;
-      targetHover = 1;
-    }
-  }, {passive:true});
-
-  // cyclic fluorescent palette: black -> purple -> green -> white -> green -> purple -> black
-  const stops = [
-    { p:0.00, c:[5,5,5] },
-    { p:0.16, c:[139,47,245] },
-    { p:0.34, c:[194,76,255] },
-    { p:0.50, c:[61,255,154] },
-    { p:0.62, c:[246,247,249] },
-    { p:0.80, c:[31,189,115] },
-    { p:1.00, c:[5,5,5] }
-  ];
-  function palette(v){
-    v = v - Math.floor(v); // wrap 0..1
-    for(let i=0; i<stops.length-1; i++){
-      const a = stops[i], b = stops[i+1];
-      if(v >= a.p && v <= b.p){
-        const f = (v - a.p) / (b.p - a.p);
-        return [
-          a.c[0] + (b.c[0]-a.c[0])*f,
-          a.c[1] + (b.c[1]-a.c[1])*f,
-          a.c[2] + (b.c[2]-a.c[2])*f
-        ];
-      }
-    }
-    return stops[0].c;
-  }
-
-  let t = 0;
-
-  function draw(){
-    t += 0.006;
-    mouseX += (targetX - mouseX) * 0.05;
-    mouseY += (targetY - mouseY) * 0.05;
-    hover += (targetHover - hover) * 0.04;
-
-    const mx = (mouseX / W) * bw;
-    const my = (mouseY / H) * bh;
-
-    let idx = 0;
-    for(let y = 0; y < bh; y++){
-      for(let x = 0; x < bw; x++){
-        // layered sine waves flowing across the whole field
-        let v = 0;
-        v += Math.sin(x * 0.09 + t * 1.4);
-        v += Math.sin(y * 0.14 - t * 1.1);
-        v += Math.sin((x + y) * 0.05 + t * 0.8);
-        v += Math.sin((x - y) * 0.07 - t * 1.6);
-
-        // ripple that flares up + distorts the flow near the cursor (collision effect)
-        const dx = x - mx, dy = y - my;
-        const dist = Math.sqrt(dx*dx + dy*dy);
-        v += hover * Math.sin(dist * 0.35 - t * 6) * Math.exp(-dist / 22) * 3;
-
-        const n = (v / 4 + 1) / 2 + t * 0.02; // normalize + slow overall drift
-        const [r,g,b] = palette(n);
-
-        data[idx++] = r;
-        data[idx++] = g;
-        data[idx++] = b;
-        data[idx++] = 255;
-      }
-    }
-
-    bctx.putImageData(imgData, 0, 0);
-    ctx.clearRect(0, 0, W, H);
-    ctx.filter = 'blur(6px)';
-    ctx.drawImage(buffer, 0, 0, bw, bh, 0, 0, W, H);
-    ctx.filter = 'none';
-
-    requestAnimationFrame(draw);
-  }
-
-  draw();
-})();
-</script>
+</div>
 </body>
 </html>
